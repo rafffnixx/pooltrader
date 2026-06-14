@@ -33,9 +33,7 @@ const Navbar = () => {
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6">
             <Link to="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Home</Link>
-            <Link to="/about" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">About</Link>
-            <Link to="/faq" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">FAQ</Link>
-            <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Contact</Link>
+
             
             
             
@@ -60,6 +58,13 @@ const Navbar = () => {
 )}
               </>
             )}
+
+
+            <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Contact</Link>
+            <Link to="/about" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">About</Link>
+            <Link to="/faq" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">FAQ</Link>
+
+            
           </div>
 
           {/* Right side buttons */}

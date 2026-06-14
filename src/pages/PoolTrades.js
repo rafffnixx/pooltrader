@@ -14,6 +14,7 @@ const PoolTrades = () => {
     const [openPositions, setOpenPositions] = useState([]);
     const [tradeStats, setTradeStats] = useState({});
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [showAddTradeModal, setShowAddTradeModal] = useState(false);
     const [selectedTrade, setSelectedTrade] = useState(null);
     const [showCloseModal, setShowCloseModal] = useState(false);
@@ -30,25 +31,51 @@ const PoolTrades = () => {
     useEffect(() => {
         if (user?.isAdmin && poolId) {
             fetchPoolTrades();
+        } else if (!user?.isAdmin) {
+            setError('Admin access required');
+            setLoading(false);
         }
     }, [poolId, user]);
 
     const fetchPoolTrades = async () => {
         setLoading(true);
+        setError(null);
         try {
-            const [poolRes, tradesRes, positionsRes, statsRes] = await Promise.all([
-                api.get(`/pools/${poolId}`),
-                api.get(`/admin/trade-management/pool/${poolId}/trades`),
-                api.get(`/admin/trade-management/pool/${poolId}/positions`),
-                api.get(`/admin/trade-management/pool/${poolId}/summary`)
+            const poolRes = await api.get(`/pools/${poolId}`).catch(err => {
+                console.error('Pool fetch error:', err);
+                return { data: { success: false } };
+            });
+            
+            if (poolRes.data.success) {
+                setPool(poolRes.data.pool);
+            } else {
+                setError('Pool not found');
+                setLoading(false);
+                return;
+            }
+            
+            const [tradesRes, positionsRes, statsRes] = await Promise.all([
+                api.get(`/admin/trade-management/pool/${poolId}/trades`).catch(err => {
+                    console.error('Trades fetch error:', err);
+                    return { data: { success: false, trades: [] } };
+                }),
+                api.get(`/admin/trade-management/pool/${poolId}/positions`).catch(err => {
+                    console.error('Positions fetch error:', err);
+                    return { data: { success: false, positions: [] } };
+                }),
+                api.get(`/admin/trade-management/pool/${poolId}/summary`).catch(err => {
+                    console.error('Stats fetch error:', err);
+                    return { data: { success: false, tradeStats: {} } };
+                })
             ]);
             
-            if (poolRes.data.success) setPool(poolRes.data.pool);
-            if (tradesRes.data.success) setTrades(tradesRes.data.trades);
-            if (positionsRes.data.success) setOpenPositions(positionsRes.data.positions);
-            if (statsRes.data.success) setTradeStats(statsRes.data.tradeStats);
+            if (tradesRes.data.success) setTrades(tradesRes.data.trades || []);
+            if (positionsRes.data.success) setOpenPositions(positionsRes.data.positions || []);
+            if (statsRes.data.success) setTradeStats(statsRes.data.tradeStats || {});
+            
         } catch (error) {
             console.error('Error fetching pool trades:', error);
+            setError('Failed to load trade data');
             toast.error('Failed to load trade data');
         } finally {
             setLoading(false);
@@ -60,7 +87,7 @@ const PoolTrades = () => {
         try {
             const response = await api.post('/admin/trade-management/trade', {
                 ...formData,
-                pool_id: poolId,
+                pool_id: parseInt(poolId),
                 volume: parseFloat(formData.volume),
                 open_price: parseFloat(formData.open_price),
                 stop_loss: formData.stop_loss ? parseFloat(formData.stop_loss) : null,
@@ -116,6 +143,24 @@ const PoolTrades = () => {
 
     if (!user?.isAdmin) {
         return <Navigate to="/" />;
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="text-6xl mb-4">⚠️</div>
+                    <h2 className="text-2xl font-bold text-red-600 mb-2">Error</h2>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+                    <button 
+                        onClick={() => navigate('/admin')}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                    >
+                        Back to Admin Panel
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     if (loading) {
@@ -185,7 +230,7 @@ const PoolTrades = () => {
                             <h2 className="text-2xl font-bold mb-4">📈 Open Positions</h2>
                             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                                 <div className="overflow-x-auto">
-                                    <table className="w-full min-w-[800px]">
+                                    <table className="w-full min-w-[1000px]">
                                         <thead className="bg-gray-50 dark:bg-gray-700">
                                             <tr>
                                                 <th className="p-4 text-left">Symbol</th>
@@ -290,28 +335,6 @@ const PoolTrades = () => {
                         </div>
                     </div>
 
-                    {/* Close Trade Confirmation Modal */}
-                    {showCloseModal && selectedTrade && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full">
-                                <h2 className="text-2xl font-bold mb-4">Close Trade</h2>
-                                <p className="mb-4">Are you sure you want to close <strong>{selectedTrade.symbol}</strong>?</p>
-                                <p className="text-sm text-gray-500 mb-4">Current P&L: ${(selectedTrade.current_pnl || 0).toLocaleString()}</p>
-                                <div className="flex justify-end space-x-3">
-                                    <button onClick={() => {
-                                        setShowCloseModal(false);
-                                        setSelectedTrade(null);
-                                    }} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
-                                        Cancel
-                                    </button>
-                                    <button onClick={confirmCloseTrade} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-                                        Close Trade
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
                     {/* Add Trade Modal */}
                     {showAddTradeModal && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -362,14 +385,28 @@ const PoolTrades = () => {
                                             value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} />
                                     </div>
                                     <div className="flex justify-end space-x-3 pt-4">
-                                        <button type="button" onClick={() => setShowAddTradeModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
-                                            Cancel
-                                        </button>
-                                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                                            Add Trade
-                                        </button>
+                                        <button type="button" onClick={() => setShowAddTradeModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
+                                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">Add Trade</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Close Trade Confirmation Modal */}
+                    {showCloseModal && selectedTrade && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+                                <h2 className="text-2xl font-bold mb-4">Close Trade</h2>
+                                <p className="mb-4">Are you sure you want to close <strong>{selectedTrade.symbol}</strong>?</p>
+                                <p className="text-sm text-gray-500 mb-4">Current P&L: ${(selectedTrade.current_pnl || 0).toLocaleString()}</p>
+                                <div className="flex justify-end space-x-3">
+                                    <button onClick={() => {
+                                        setShowCloseModal(false);
+                                        setSelectedTrade(null);
+                                    }} className="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
+                                    <button onClick={confirmCloseTrade} className="px-4 py-2 bg-red-600 text-white rounded-lg">Close Trade</button>
+                                </div>
                             </div>
                         </div>
                     )}

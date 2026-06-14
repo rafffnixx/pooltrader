@@ -14,6 +14,11 @@ const AdminComplete = () => {
     const [transactions, setTransactions] = useState([]);
     const [withdrawals, setWithdrawals] = useState([]);
     const [pools, setPools] = useState([]);
+    const [trades, setTrades] = useState([]);
+    const [openTrades, setOpenTrades] = useState([]);
+    const [selectedPool, setSelectedPool] = useState(null);
+    const [showTradeModal, setShowTradeModal] = useState(false);
+    const [showClosePoolModal, setShowClosePoolModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('');
@@ -21,6 +26,15 @@ const AdminComplete = () => {
     const [userDetails, setUserDetails] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
+    const [tradeForm, setTradeForm] = useState({
+        symbol: '',
+        direction: 'BUY',
+        volume: '',
+        open_price: '',
+        stop_loss: '',
+        take_profit: '',
+        notes: ''
+    });
     const [newPool, setNewPool] = useState({
         name: '',
         description: '',
@@ -56,6 +70,10 @@ const AdminComplete = () => {
                 if (usersRes.data.success) {
                     setUsers(usersRes.data.users);
                 }
+                const poolsRes = await api.get('/admin/pools');
+                if (poolsRes.data.success) {
+                    setPools(poolsRes.data.pools);
+                }
             }
             if (activeTab === 'users') {
                 const response = await api.get('/admin/users');
@@ -79,6 +97,16 @@ const AdminComplete = () => {
                 const response = await api.get('/admin/pools');
                 if (response.data.success) {
                     setPools(response.data.pools);
+                }
+            }
+            if (activeTab === 'trades') {
+                const tradesRes = await api.get('/admin/trades');
+                if (tradesRes.data.success) {
+                    setTrades(tradesRes.data.trades);
+                }
+                const openRes = await api.get('/admin/open-positions');
+                if (openRes.data.success) {
+                    setOpenTrades(openRes.data.positions);
                 }
             }
             if (activeTab === 'profits') {
@@ -116,6 +144,76 @@ const AdminComplete = () => {
             }
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to create pool');
+        }
+    };
+
+    const handleAddTrade = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await api.post('/admin/trade-management/trade', {
+                ...tradeForm,
+                pool_id: selectedPool?.id,
+                volume: parseFloat(tradeForm.volume),
+                open_price: parseFloat(tradeForm.open_price),
+                stop_loss: tradeForm.stop_loss ? parseFloat(tradeForm.stop_loss) : null,
+                take_profit: tradeForm.take_profit ? parseFloat(tradeForm.take_profit) : null
+            });
+            
+            if (response.data.success) {
+                toast.success('Trade opened successfully!');
+                setShowTradeModal(false);
+                setTradeForm({
+                    symbol: '',
+                    direction: 'BUY',
+                    volume: '',
+                    open_price: '',
+                    stop_loss: '',
+                    take_profit: '',
+                    notes: ''
+                });
+                fetchData();
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to add trade');
+        }
+    };
+
+    const handleCloseTrade = async (tradeId) => {
+        const close_price = prompt('Enter closing price:');
+        const profit_loss = prompt('Enter profit/loss amount (+ for profit, - for loss):');
+        if (close_price && profit_loss) {
+            try {
+                const response = await api.post(`/admin/trade-management/trade/${tradeId}/close`, {
+                    close_price: parseFloat(close_price),
+                    profit_loss: parseFloat(profit_loss),
+                    notes: 'Closed by admin'
+                });
+                if (response.data.success) {
+                    toast.success(response.data.message);
+                    fetchData();
+                }
+            } catch (error) {
+                toast.error('Failed to close trade');
+            }
+        }
+    };
+
+    const handleClosePool = async (poolId) => {
+        const confirmMsg = prompt('Type "CONFIRM" to close this pool and distribute remaining balance to investors:');
+        if (confirmMsg !== 'CONFIRM') {
+            toast.error('Pool closure cancelled. Type "CONFIRM" to proceed.');
+            return;
+        }
+        
+        try {
+            const response = await api.post(`/admin/pools/${poolId}/close`);
+            if (response.data.success) {
+                toast.success(response.data.message);
+                fetchData();
+                setShowClosePoolModal(false);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to close pool');
         }
     };
 
@@ -401,7 +499,7 @@ const AdminComplete = () => {
         return (
             <div className="flex justify-center items-center h-screen">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                <p className="text-gray-500">Loading admin dashboard...</p>
+                <p className="text-gray-500"></p>
             </div>
         );
     }
@@ -410,7 +508,7 @@ const AdminComplete = () => {
         { title: 'Total Users', value: analytics.totalUsers || 0, icon: '👥' },
         { title: 'Total Contributions', value: `$${(analytics.totalContributions || 0).toLocaleString()}`, icon: '💰' },
         { title: 'Pending Withdrawals', value: `$${(analytics.pendingWithdrawals || 0).toLocaleString()}`, icon: '🏦' },
-        { title: 'Total Pools', value: pools.length, icon: '🏊' },
+        { title: 'Active Trades', value: openTrades.length, icon: '📊' },
     ];
 
     return (
@@ -420,7 +518,7 @@ const AdminComplete = () => {
                 <div className="container mx-auto px-4 py-8">
                     <div className="mb-8">
                         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Admin Control Panel</h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-2">Manage users, deposits, withdrawals, pools, and platform settings</p>
+                        <p className="text-gray-600 dark:text-gray-400 mt-2">Manage users, deposits, withdrawals, pools, and trades</p>
                     </div>
 
                     <div className="flex flex-wrap gap-3 mb-8">
@@ -429,7 +527,7 @@ const AdminComplete = () => {
                     </div>
                     
                     <div className="flex flex-wrap border-b dark:border-gray-700 mb-8 gap-1">
-                        {['dashboard', 'users', 'transactions', 'withdrawals', 'pools', 'profits'].map(tab => (
+                        {['dashboard', 'users', 'transactions', 'withdrawals', 'pools', 'trades', 'profits'].map(tab => (
                             <button key={tab} onClick={() => setActiveTab(tab)} className={`px-6 py-3 font-semibold transition capitalize rounded-t-lg ${activeTab === tab ? 'bg-white dark:bg-gray-800 text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>{tab}</button>
                         ))}
                     </div>
@@ -610,27 +708,318 @@ const AdminComplete = () => {
                     {activeTab === 'pools' && (
                         <div className="space-y-4">
                             <button onClick={() => { setModalType('createPool'); setShowModal(true); }} className="mb-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">+ Create New Pool</button>
-                            {pools.map(pool => (
-                                <div key={pool.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-                                    <div className="flex justify-between items-start flex-wrap">
-                                        <div>
-                                            <h3 className="text-xl font-bold">{pool.name}</h3>
-                                            <p className="text-gray-500 text-sm">{new Date(pool.start_date).toLocaleDateString()} - {new Date(pool.end_date).toLocaleDateString()}</p>
-                                            <div className="mt-2 grid grid-cols-2 gap-4">
-                                                <p>Target: ${parseFloat(pool.total_target).toLocaleString()}</p>
-                                                <p>Current: ${parseFloat(pool.current_total).toLocaleString()}</p>
-                                                <p>Members: {pool.member_count || 0}</p>
-                                                <p>Min: ${parseFloat(pool.min_contribution).toLocaleString()}</p>
-                                                <p>Max: ${parseFloat(pool.max_contribution).toLocaleString()}</p>
-                                                <p>Fee: {pool.manager_fee_percent}%</p>
+                            {pools.map(pool => {
+                                const progress = (parseFloat(pool.current_total) / parseFloat(pool.total_target)) * 100;
+                                const isActive = pool.status === 'open' || pool.status === 'active';
+                                const hasEnded = new Date(pool.end_date) < new Date();
+                                
+                                return (
+                                    <div key={pool.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition cursor-pointer"
+                                         onClick={() => navigate(`/pool/${pool.id}/trades`)}>
+                                        <div className={`h-2 ${isActive ? 'bg-gradient-to-r from-green-500 to-green-600' : hasEnded ? 'bg-gray-500' : 'bg-gradient-to-r from-blue-500 to-purple-600'}`}></div>
+                                        <div className="p-6">
+                                            <div className="flex justify-between items-start flex-wrap">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <h3 className="text-xl font-bold">{pool.name}</h3>
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                            isActive ? 'bg-green-100 text-green-800' : 
+                                                            hasEnded ? 'bg-gray-100 text-gray-800' : 'bg-blue-100 text-blue-800'
+                                                        }`}>
+                                                            {isActive ? 'ACTIVE' : hasEnded ? 'ENDED' : pool.status.toUpperCase()}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-gray-500 text-sm">
+                                                        {new Date(pool.start_date).toLocaleDateString()} - {new Date(pool.end_date).toLocaleDateString()}
+                                                    </p>
+                                                    <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                        <div>
+                                                            <p className="text-xs text-gray-500">Target</p>
+                                                            <p className="font-semibold">${parseFloat(pool.total_target).toLocaleString()}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs text-gray-500">Current</p>
+                                                            <p className="font-semibold text-blue-600">${parseFloat(pool.current_total).toLocaleString()}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs text-gray-500">Members</p>
+                                                            <p className="font-semibold">{pool.member_count || 0}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs text-gray-500">Fee</p>
+                                                            <p className="font-semibold">{pool.manager_fee_percent}%</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-4">
+                                                        <div className="flex justify-between text-sm mb-1">
+                                                            <span>Progress</span>
+                                                            <span>{progress.toFixed(1)}%</span>
+                                                        </div>
+                                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                                            <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full" style={{ width: `${progress}%` }}></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-4 md:mt-0 flex flex-col gap-2">
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); navigate(`/pool/${pool.id}/trades`); }}
+                                                        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+                                                    >
+                                                        📊 Manage Trades
+                                                    </button>
+                                                    {isActive && (
+                                                        <button 
+                                                            onClick={(e) => { e.stopPropagation(); setSelectedPool(pool); setShowClosePoolModal(true); }}
+                                                            className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition"
+                                                        >
+                                                            🔒 Close Pool
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <span className={`px-3 py-1 rounded-full text-sm ${pool.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-gray-100'}`}>{pool.status.toUpperCase()}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* Trades Tab */}
+                    {activeTab === 'trades' && (
+                        <div>
+                            <div className="mb-6">
+                                <button 
+                                    onClick={() => { 
+                                        if (!selectedPool) {
+                                            toast.error('Please select a pool first from the Pools tab');
+                                            setActiveTab('pools');
+                                        } else {
+                                            setShowTradeModal(true);
+                                        }
+                                    }}
+                                    className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition shadow-lg"
+                                >
+                                    + Open New Trade
+                                </button>
+                            </div>
+
+                            {openTrades.length > 0 && (
+                                <div className="mb-8">
+                                    <h2 className="text-2xl font-bold mb-4">📈 Open Positions</h2>
+                                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full min-w-[1000px]">
+                                                <thead className="bg-gray-50 dark:bg-gray-700">
+                                                    <tr>
+                                                        <th className="p-4 text-left">Open Time</th>
+                                                        <th className="p-4 text-left">Pool</th>
+                                                        <th className="p-4 text-left">Symbol</th>
+                                                        <th className="p-4 text-left">Direction</th>
+                                                        <th className="p-4 text-left">Volume</th>
+                                                        <th className="p-4 text-left">Entry Price</th>
+                                                        <th className="p-4 text-left">Stop Loss</th>
+                                                        <th className="p-4 text-left">Take Profit</th>
+                                                        <th className="p-4 text-left">Current P&amp;L</th>
+                                                        <th className="p-4 text-left">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {openTrades.map(trade => (
+                                                        <tr key={trade.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                                            <td className="p-4 text-sm">{new Date(trade.open_time).toLocaleString()}</td>
+                                                            <td className="p-4 font-medium">{trade.pool_name}</td>
+                                                            <td className="p-4 font-semibold">{trade.symbol}</td>
+                                                            <td className="p-4">
+                                                                <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                                                                    trade.direction === 'BUY' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                                }`}>
+                                                                    {trade.direction}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-4">{trade.volume}</td>
+                                                            <td className="p-4">${parseFloat(trade.open_price).toFixed(4)}</td>
+                                                            <td className="p-4 text-red-600">{trade.stop_loss ? `$${parseFloat(trade.stop_loss).toFixed(4)}` : '-'}</td>
+                                                            <td className="p-4 text-green-600">{trade.take_profit ? `$${parseFloat(trade.take_profit).toFixed(4)}` : '-'}</td>
+                                                            <td className={`p-4 font-semibold ${(trade.current_pnl || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                                ${(trade.current_pnl || 0).toLocaleString()}
+                                                                <span className="text-xs block">{(trade.pnl_percentage || 0).toFixed(2)}%</span>
+                                                            </td>
+                                                            <td className="p-4">
+                                                                <button 
+                                                                    onClick={() => handleCloseTrade(trade.id)} 
+                                                                    className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition"
+                                                                >
+                                                                    Close
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+                            )}
+
+                            <div>
+                                <h2 className="text-2xl font-bold mb-4">📋 Trade History</h2>
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full min-w-[1000px]">
+                                            <thead className="bg-gray-50 dark:bg-gray-700">
+                                                <tr>
+                                                    <th className="p-4 text-left">Open Time</th>
+                                                    <th className="p-4 text-left">Close Time</th>
+                                                    <th className="p-4 text-left">Pool</th>
+                                                    <th className="p-4 text-left">Symbol</th>
+                                                    <th className="p-4 text-left">Direction</th>
+                                                    <th className="p-4 text-left">Entry</th>
+                                                    <th className="p-4 text-left">Exit</th>
+                                                    <th className="p-4 text-left">P&amp;L</th>
+                                                    <th className="p-4 text-left">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {trades.map(trade => (
+                                                    <tr key={trade.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                                        <td className="p-4 text-sm">{new Date(trade.open_time).toLocaleString()}</td>
+                                                        <td className="p-4 text-sm">{trade.close_time ? new Date(trade.close_time).toLocaleString() : '-'}</td>
+                                                        <td className="p-4">{trade.pool_name}</td>
+                                                        <td className="p-4 font-semibold">{trade.symbol}</td>
+                                                        <td className="p-4">
+                                                            <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                                                                trade.direction === 'BUY' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                            }`}>
+                                                                {trade.direction}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-4">${parseFloat(trade.open_price).toFixed(4)}</td>
+                                                        <td className="p-4">{trade.close_price ? `$${parseFloat(trade.close_price).toFixed(4)}` : '-'}</td>
+                                                        <td className={`p-4 font-semibold ${(trade.profit_loss || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                            {trade.profit_loss ? `${trade.profit_loss >= 0 ? '+' : ''}$${parseFloat(trade.profit_loss).toLocaleString()}` : '-'}
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <span className={`px-2 py-1 rounded text-xs ${
+                                                                trade.status === 'closed' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'
+                                                            }`}>
+                                                                {trade.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {trades.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan="9" className="p-8 text-center text-gray-500">No trades found</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Add Trade Modal */}
+                    {showTradeModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-2xl font-bold">Open New Trade Position</h2>
+                                    <button onClick={() => setShowTradeModal(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+                                </div>
+                                <form onSubmit={handleAddTrade} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Select Pool</label>
+                                        <select 
+                                            className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                            value={selectedPool?.id || ''}
+                                            onChange={(e) => {
+                                                const pool = pools.find(p => p.id === parseInt(e.target.value));
+                                                setSelectedPool(pool);
+                                            }}
+                                            required
+                                        >
+                                            <option value="">Select a pool</option>
+                                            {pools.filter(p => p.status === 'open').map(p => (
+                                                <option key={p.id} value={p.id}>{p.name} (${parseFloat(p.current_total).toLocaleString()} / ${parseFloat(p.total_target).toLocaleString()})</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Symbol</label>
+                                        <input type="text" placeholder="e.g., EUR/USD, BTC/USD" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                            value={tradeForm.symbol} onChange={(e) => setTradeForm({...tradeForm, symbol: e.target.value})} required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Direction</label>
+                                        <select className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                            value={tradeForm.direction} onChange={(e) => setTradeForm({...tradeForm, direction: e.target.value})} required>
+                                            <option value="BUY">📈 BUY (Long)</option>
+                                            <option value="SELL">📉 SELL (Short)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Volume</label>
+                                        <input type="number" step="0.01" placeholder="Volume" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                            value={tradeForm.volume} onChange={(e) => setTradeForm({...tradeForm, volume: e.target.value})} required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Open Price</label>
+                                        <input type="number" step="0.0001" placeholder="Open Price" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                            value={tradeForm.open_price} onChange={(e) => setTradeForm({...tradeForm, open_price: e.target.value})} required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Stop Loss (Optional)</label>
+                                        <input type="number" step="0.0001" placeholder="Stop Loss" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                            value={tradeForm.stop_loss} onChange={(e) => setTradeForm({...tradeForm, stop_loss: e.target.value})} />
+                                        <p className="text-xs text-gray-500 mt-1">Automatic exit if price hits this level</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Take Profit (Optional)</label>
+                                        <input type="number" step="0.0001" placeholder="Take Profit" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                            value={tradeForm.take_profit} onChange={(e) => setTradeForm({...tradeForm, take_profit: e.target.value})} />
+                                        <p className="text-xs text-gray-500 mt-1">Automatic profit taking at this level</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Notes</label>
+                                        <textarea placeholder="Trade notes" rows="2" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                            value={tradeForm.notes} onChange={(e) => setTradeForm({...tradeForm, notes: e.target.value})} />
+                                    </div>
+                                    <div className="flex justify-end space-x-3 pt-4">
+                                        <button type="button" onClick={() => setShowTradeModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
+                                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">Open Trade</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Close Pool Confirmation Modal */}
+                    {showClosePoolModal && selectedPool && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+                                <h2 className="text-2xl font-bold mb-4 text-red-600">⚠️ Close Pool</h2>
+                                <p className="mb-4">Are you sure you want to close <strong>{selectedPool.name}</strong>?</p>
+                                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg mb-4">
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                                        <strong>Warning:</strong> Closing this pool will:
+                                    </p>
+                                    <ul className="text-xs text-gray-500 mt-2 list-disc list-inside">
+                                        <li>Close all open trades</li>
+                                        <li>Calculate final pool balance</li>
+                                        <li>Distribute remaining funds to investors based on their contribution percentage</li>
+                                        <li>Mark the pool as closed</li>
+                                    </ul>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-4">
+                                    Type <strong className="text-red-600">"CONFIRM"</strong> to proceed with closing this pool.
+                                </p>
+                                <div className="flex justify-end space-x-3">
+                                    <button onClick={() => setShowClosePoolModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
+                                    <button onClick={() => handleClosePool(selectedPool.id)} className="px-4 py-2 bg-red-600 text-white rounded-lg">Close Pool</button>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -645,8 +1034,8 @@ const AdminComplete = () => {
                                         <label className="block text-sm font-medium mb-1">Select Pool</label>
                                         <select value={profitDistribution.poolId} onChange={(e) => setProfitDistribution({...profitDistribution, poolId: e.target.value})} className="w-full p-2 border rounded-lg" required>
                                             <option value="">Select Pool</option>
-                                            {pools.filter(p => p.status === 'open' || p.status === 'active').map(p => (
-                                                <option key={p.id} value={p.id}>{p.name} (${parseFloat(p.current_total).toLocaleString()} raised)</option>
+                                            {pools.filter(p => p.status === 'closed' || p.status === 'settled').map(p => (
+                                                <option key={p.id} value={p.id}>{p.name} (Final: ${parseFloat(p.current_total).toLocaleString()})</option>
                                             ))}
                                         </select>
                                     </div>
@@ -677,6 +1066,10 @@ const AdminComplete = () => {
                                         <div className="font-bold text-green-600">Formula:</div>
                                         <p>Your Profit = (Pool Profit × Your Contribution %)</p>
                                         <p>Final Amount = Your Profit - (Your Profit × Fee %)</p>
+                                    </div>
+                                    <div className="p-3 bg-yellow-50 rounded-lg">
+                                        <div className="font-bold text-yellow-600">When Pool Closes:</div>
+                                        <p>When a pool is closed, the remaining balance is distributed to all investors based on their contribution percentage.</p>
                                     </div>
                                 </div>
                             </div>
