@@ -13,16 +13,17 @@ import AdminComplete from './pages/AdminComplete';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
-import Customers from './pages/Customers';
-import PoolTrades from './pages/PoolTrades';
 import Wallet from './pages/Wallet';
 import PoolDetails from './pages/PoolDetails';
-
-
-
-
-
-
+import PoolTrades from './pages/PoolTrades';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import FAQ from './pages/FAQ';
+import VerifyEmail from './pages/VerifyEmail';
 
 
 // Import components
@@ -47,19 +48,20 @@ function App() {
                 <Route path="/contribute" element={<Contribute />} />
                 <Route path="/history" element={<History />} />
                 <Route path="/admin" element={<AdminComplete />} />
-
-                <Route path="/customers" element={<Customers />} />
-
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="*" element={<NotFound />} />
-                <Route path="/pools/active/:id" element={<ActivePool />} />
-                <Route path="/pools/active" element={<ActivePool />} />
-                <Route path="/pool/:poolId/trades" element={<PoolTrades />} />
                 <Route path="/wallet" element={<Wallet />} />
                 <Route path="/pool/:id/details" element={<PoolDetails />} />
-
-
+                <Route path="/pool/:id/trades" element={<PoolTrades />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password/:token" element={<ResetPassword />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="*" element={<NotFound />} />
+                <Route path="/verify-email/:code" element={<VerifyEmail />} />
 
               </Routes>
             </main>

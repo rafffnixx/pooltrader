@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
+import api from '../services/api';
 import toast from 'react-hot-toast';
 
 const Register = () => {
@@ -15,6 +16,10 @@ const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [agreeTerms, setAgreeTerms] = useState(false);
+    const [showVerification, setShowVerification] = useState(false);
+    const [verificationCode, setVerificationCode] = useState('');
+    const [registeredEmail, setRegisteredEmail] = useState('');
+    const [resendTimer, setResendTimer] = useState(0);
     const { register } = useAuth();
     const navigate = useNavigate();
 
@@ -24,7 +29,6 @@ const Register = () => {
             ...formData,
             [name]: value
         });
-        // Clear error for this field
         if (errors[name]) {
             setErrors({ ...errors, [name]: '' });
         }
@@ -75,17 +79,86 @@ const Register = () => {
         setIsLoading(true);
         
         try {
-            await register(formData.email, formData.password, formData.fullName);
-            toast.success('Registration successful! Welcome to PoolTrader!', {
-                duration: 4000,
-                icon: '🎉',
+            const response = await api.post('/auth/register', {
+                email: formData.email,
+                password: formData.password,
+                fullName: formData.fullName
             });
-            navigate('/dashboard');
+            
+            if (response.data.success) {
+                if (response.data.requiresVerification) {
+                    setRegisteredEmail(formData.email);
+                    setShowVerification(true);
+                    toast.success('Registration successful! Please check your email for verification code.');
+                    startResendTimer();
+                } else {
+                    toast.success('Registration successful! Welcome to PoolTrader!');
+                    navigate('/dashboard');
+                }
+            }
         } catch (error) {
-            toast.error(error.message || 'Registration failed. Please try again.');
+            toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleVerifyEmail = async () => {
+        if (!verificationCode || verificationCode.length !== 6) {
+            toast.error('Please enter the 6-digit verification code');
+            return;
+        }
+        
+        setIsLoading(true);
+        
+        try {
+            const response = await api.post('/auth/verify-email', {
+                email: registeredEmail,
+                code: verificationCode
+            });
+            
+            if (response.data.success) {
+                // Store token and user data
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+                toast.success('Email verified! Welcome to PoolTrader!');
+                navigate('/dashboard');
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Verification failed. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleResendCode = async () => {
+        if (resendTimer > 0) return;
+        
+        try {
+            const response = await api.post('/auth/resend-verification', {
+                email: registeredEmail
+            });
+            
+            if (response.data.success) {
+                toast.success('New verification code sent to your email!');
+                startResendTimer();
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to resend code');
+        }
+    };
+
+    const startResendTimer = () => {
+        setResendTimer(60);
+        const timer = setInterval(() => {
+            setResendTimer(prev => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
     };
 
     const passwordStrength = () => {
@@ -103,24 +176,96 @@ const Register = () => {
         return { text: 'Strong', color: 'green', width: '100%' };
     };
 
+    if (showVerification) {
+        return (
+            <>
+                <SEO title="Verify Email - PoolTrader" description="Verify your email address" />
+                
+                <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+                    <div className="absolute inset-0 bg-black opacity-50"></div>
+                    <div className="relative z-10 max-w-md w-full">
+                        <div className="text-center mb-8">
+                            <div className="flex justify-center mb-4">
+                                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                                    <span className="text-4xl">📧</span>
+                                </div>
+                            </div>
+                            <h2 className="text-3xl font-bold text-white">Verify Your Email</h2>
+                            <p className="text-gray-300 mt-2">
+                                We've sent a verification code to<br />
+                                <strong className="text-blue-400">{registeredEmail}</strong>
+                            </p>
+                        </div>
+                        
+                        <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-gray-700">
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="text-gray-300 text-sm font-semibold block mb-2">
+                                        Enter Verification Code
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={verificationCode}
+                                        onChange={(e) => setVerificationCode(e.target.value)}
+                                        placeholder="Enter 6-digit code"
+                                        maxLength="6"
+                                        className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl tracking-widest"
+                                    />
+                                    <p className="text-gray-400 text-sm mt-2 text-center">
+                                        Check your spam folder if you don't see the email
+                                    </p>
+                                </div>
+                                
+                                <button
+                                    onClick={handleVerifyEmail}
+                                    disabled={isLoading}
+                                    className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
+                                >
+                                    {isLoading ? 'Verifying...' : 'Verify Email'}
+                                </button>
+                                
+                                <div className="text-center">
+                                    <button
+                                        onClick={handleResendCode}
+                                        disabled={resendTimer > 0}
+                                        className="text-blue-400 hover:text-blue-300 text-sm disabled:opacity-50"
+                                    >
+                                        {resendTimer > 0 
+                                            ? `Resend code in ${resendTimer}s` 
+                                            : 'Resend verification code'}
+                                    </button>
+                                </div>
+                                
+                                <div className="text-center">
+                                    <Link to="/login" className="text-gray-400 hover:text-gray-300 text-sm">
+                                        ← Back to Login
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
             <SEO title="Register - PoolTrader" description="Create a new trading pool account" />
             
-            <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+            <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
                 <div className="absolute inset-0 bg-black opacity-50"></div>
                 <div className="relative z-10 max-w-md w-full">
-                    {/* Logo */}
                     <div className="text-center mb-8">
                         <div className="flex justify-center mb-4">
-                            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl animate-pulse">
+                            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
                                 <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                 </svg>
                             </div>
                         </div>
-                        <h2 className="text-4xl font-bold text-white mb-2">Join PoolTradre</h2>
-                        <p className="text-gray-300">Start your trading journey today</p>
+                        <h2 className="text-3xl font-bold text-white">Create Account</h2>
+                        <p className="text-gray-300 mt-2">Start your trading journey today</p>
                     </div>
                     
                     <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-gray-700">
@@ -131,9 +276,7 @@ const Register = () => {
                                     Full Name
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                        👤
-                                    </span>
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">👤</span>
                                     <input
                                         name="fullName"
                                         type="text"
@@ -145,9 +288,7 @@ const Register = () => {
                                         placeholder="John Doe"
                                     />
                                 </div>
-                                {errors.fullName && (
-                                    <p className="text-red-400 text-xs mt-1">{errors.fullName}</p>
-                                )}
+                                {errors.fullName && <p className="text-red-400 text-xs mt-1">{errors.fullName}</p>}
                             </div>
 
                             {/* Email Field */}
@@ -156,9 +297,7 @@ const Register = () => {
                                     Email Address
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                        📧
-                                    </span>
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">📧</span>
                                     <input
                                         name="email"
                                         type="email"
@@ -170,9 +309,7 @@ const Register = () => {
                                         placeholder="you@example.com"
                                     />
                                 </div>
-                                {errors.email && (
-                                    <p className="text-red-400 text-xs mt-1">{errors.email}</p>
-                                )}
+                                {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
                             </div>
 
                             {/* Password Field */}
@@ -181,9 +318,7 @@ const Register = () => {
                                     Password
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                        🔒
-                                    </span>
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔒</span>
                                     <input
                                         name="password"
                                         type={showPassword ? "text" : "password"}
@@ -203,7 +338,6 @@ const Register = () => {
                                     </button>
                                 </div>
                                 
-                                {/* Password Strength Indicator */}
                                 {formData.password && (
                                     <div className="mt-2">
                                         <div className="flex justify-between text-xs mb-1">
@@ -213,16 +347,11 @@ const Register = () => {
                                             </span>
                                         </div>
                                         <div className="w-full bg-gray-700 rounded-full h-1">
-                                            <div 
-                                                className={`h-1 rounded-full transition-all duration-300 bg-${passwordStrength().color}-500`}
-                                                style={{ width: passwordStrength().width }}
-                                            ></div>
+                                            <div className={`h-1 rounded-full transition-all duration-300 bg-${passwordStrength().color}-500`} style={{ width: passwordStrength().width }}></div>
                                         </div>
                                     </div>
                                 )}
-                                {errors.password && (
-                                    <p className="text-red-400 text-xs mt-1">{errors.password}</p>
-                                )}
+                                {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
                                 <p className="text-gray-500 text-xs mt-1">
                                     Must contain at least 6 characters, uppercase, lowercase, and number
                                 </p>
@@ -234,9 +363,7 @@ const Register = () => {
                                     Confirm Password
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                        🔒
-                                    </span>
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔒</span>
                                     <input
                                         name="confirmPassword"
                                         type={showPassword ? "text" : "password"}
@@ -248,9 +375,7 @@ const Register = () => {
                                         placeholder="Confirm your password"
                                     />
                                 </div>
-                                {errors.confirmPassword && (
-                                    <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>
-                                )}
+                                {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
                             </div>
 
                             {/* Terms and Conditions */}
@@ -273,9 +398,7 @@ const Register = () => {
                                     </Link>
                                 </label>
                             </div>
-                            {errors.terms && (
-                                <p className="text-red-400 text-xs">{errors.terms}</p>
-                            )}
+                            {errors.terms && <p className="text-red-400 text-xs">{errors.terms}</p>}
 
                             {/* Submit Button */}
                             <button
@@ -304,18 +427,6 @@ const Register = () => {
                                 </p>
                             </div>
                         </form>
-                    </div>
-
-                    {/* Benefits Section */}
-                    <div className="mt-6 text-center">
-                        <p className="text-gray-400 text-sm">
-                            By joining, you get access to:
-                        </p>
-                        <div className="flex justify-center space-x-6 mt-3 text-xs text-gray-400">
-                            <span>✓ Professional Trading</span>
-                            <span>✓ Real-time Updates</span>
-                            <span>✓ 24/7 Support</span>
-                        </div>
                     </div>
                 </div>
             </div>

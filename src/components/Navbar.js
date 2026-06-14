@@ -33,12 +33,20 @@ const Navbar = () => {
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6">
             <Link to="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Home</Link>
+            <Link to="/about" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">About</Link>
+            <Link to="/faq" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">FAQ</Link>
+            <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Contact</Link>
+            
+            
+            
             {isAuthenticated && (
               <>
                 <Link to="/dashboard" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Dashboard</Link>
                 <Link to="/pools/active" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Active Pool</Link>
                 <Link to="/history" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">History</Link>
                 <Link to="/wallet" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition">Wallet</Link>
+                {/* Add these links in the desktop menu section */}
+
 
 {user?.isAdmin && (
   <>
