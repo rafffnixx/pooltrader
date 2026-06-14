@@ -32,13 +32,12 @@ const Home = () => {
 
     const [currentHero, setCurrentHero] = useState(0);
 
-    useEffect(() => {
-        fetchData();
-        const interval = setInterval(() => {
-            setCurrentHero((prev) => (prev + 1) % heroImages.length);
-        }, 6000);
-        return () => clearInterval(interval);
-    }, []);
+useEffect(() => {
+    const interval = setInterval(() => {
+        setCurrentHero((prev) => (prev + 1) % heroImages.length);
+    }, 6000);
+    return () => clearInterval(interval);
+}, [heroImages.length]); // Add heroImages.length to dependency array
 
     const fetchData = async () => {
         try {

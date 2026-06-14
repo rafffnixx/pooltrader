@@ -17,12 +17,43 @@ const PoolDetails = () => {
     const [contributeAmount, setContributeAmount] = useState(1000);
     const [walletBalance, setWalletBalance] = useState({ withdrawable: 0 });
 
-    useEffect(() => {
-        fetchPoolDetails();
-        if (user) {
-            fetchWalletBalance();
+useEffect(() => {
+    const fetchPoolDetails = async () => {
+        try {
+            const response = await api.get(`/pool/${id}`);
+            if (response.data.success) {
+                setPool(response.data.pool);
+                setContributions(response.data.contributions || []);
+                setTrades(response.data.trades || []);
+            } else {
+                toast.error('Pool not found');
+                navigate('/dashboard');
+            }
+        } catch (error) {
+            console.error('Error fetching pool details:', error);
+            toast.error('Failed to load pool details');
+            navigate('/dashboard');
+        } finally {
+            setLoading(false);
         }
-    }, [id]);
+    };
+
+    const fetchWalletBalance = async () => {
+        try {
+            const response = await api.get('/wallet/balance');
+            if (response.data.success) {
+                setWalletBalance(response.data.balance);
+            }
+        } catch (error) {
+            console.error('Error fetching wallet balance:', error);
+        }
+    };
+
+    fetchPoolDetails();
+    if (user) {
+        fetchWalletBalance();
+    }
+}, [id, user, navigate]); // Remove fetchPoolDetails and user from deps, keep only id
 
     const fetchPoolDetails = async () => {
         try {
