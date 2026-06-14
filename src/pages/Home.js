@@ -32,12 +32,14 @@ const Home = () => {
 
     const [currentHero, setCurrentHero] = useState(0);
 
-useEffect(() => {
-    const interval = setInterval(() => {
-        setCurrentHero((prev) => (prev + 1) % heroImages.length);
-    }, 6000);
-    return () => clearInterval(interval);
-}, [heroImages.length]); // Add heroImages.length to dependency array
+    useEffect(() => {
+        fetchData();
+        const interval = setInterval(() => {
+            setCurrentHero((prev) => (prev + 1) % heroImages.length);
+        }, 6000);
+        return () => clearInterval(interval);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const fetchData = async () => {
         try {
@@ -150,7 +152,7 @@ useEffect(() => {
                         <div className="grid md:grid-cols-4 gap-8">
                             <div className="text-center transform hover:scale-105 transition">
                                 <div className="text-4xl mb-2">💰</div>
-                                <div className="text-3xl font-bold text-white">$87.4K</div>
+                                <div className="text-3xl font-bold text-white">${parseFloat(stats.poolTotal).toLocaleString()}</div>
                                 <p className="text-gray-300">Pool Volume</p>
                             </div>
                             <div className="text-center transform hover:scale-105 transition">

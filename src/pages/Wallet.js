@@ -6,8 +6,8 @@ import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 
 const Wallet = () => {
-const { user: currentUser } = useAuth();    
-const [balance, setBalance] = useState({
+    // Removed unused currentUser variable
+    const [balance, setBalance] = useState({
         total: 0,
         allocated: 0,
         withdrawable: 0,

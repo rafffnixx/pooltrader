@@ -27,33 +27,11 @@ const PoolTrades = () => {
         notes: ''
     });
 
-useEffect(() => {
-    const fetchPoolTrades = async () => {
-        setLoading(true);
-        try {
-            const [poolRes, tradesRes, positionsRes, statsRes] = await Promise.all([
-                api.get(`/pools/${poolId}`),
-                api.get(`/admin/trade-management/pool/${poolId}/trades`),
-                api.get(`/admin/trade-management/pool/${poolId}/positions`),
-                api.get(`/admin/trade-management/pool/${poolId}/summary`)
-            ]);
-            
-            if (poolRes.data.success) setPool(poolRes.data.pool);
-            if (tradesRes.data.success) setTrades(tradesRes.data.trades);
-            if (positionsRes.data.success) setOpenPositions(positionsRes.data.positions);
-            if (statsRes.data.success) setTradeStats(statsRes.data.tradeStats);
-        } catch (error) {
-            console.error('Error fetching pool trades:', error);
-            toast.error('Failed to load trade data');
-        } finally {
-            setLoading(false);
+    useEffect(() => {
+        if (user?.isAdmin && poolId) {
+            fetchPoolTrades();
         }
-    };
-
-    if (user?.isAdmin && poolId) {
-        fetchPoolTrades();
-    }
-}, [poolId, user]);
+    }, [poolId, user]);
 
     const fetchPoolTrades = async () => {
         setLoading(true);

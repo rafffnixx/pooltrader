@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
-import { getActivePool, getStats, getPoolsList } from '../services/api';
+import { getStats, getPoolsList } from '../services/api';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -53,67 +53,67 @@ const Dashboard = () => {
         return () => clearInterval(interval);
     }, []);
 
-const fetchDashboardData = async () => {
-    try {
-        const [poolsData, statsData, walletData, activitiesData] = await Promise.all([
-            getPoolsList(),
-            getStats(),
-            api.get('/wallet/balance').catch(() => ({ data: { success: false, balance: { total: 0, allocated: 0, withdrawable: 0 } } })),
-            api.get('/wallet/transactions').catch(() => ({ data: { success: false, transactions: [] } }))
-        ]);
-        
-        if (poolsData.success) {
-            setPools(poolsData.pools || []);
-        }
-        
-        if (statsData.success) {
-            setStats(statsData.stats);
-        }
-        
-        if (walletData.data?.success) {
-            setWalletBalance(walletData.data.balance);
-        } else {
-            // Fallback: calculate from user data
-            if (user) {
-                const userRes = await api.get('/auth/me');
-                if (userRes.data.success) {
-                    const totalBalance = userRes.data.user.currentBalance || 0;
-                    // Get allocated from contributions
-                    const contributionsRes = await api.get(`/user/${user.id}/contributions`);
-                    let allocated = 0;
-                    if (contributionsRes.data.success) {
-                        allocated = contributionsRes.data.contributions
-                            .filter(c => c.status === 'confirmed')
-                            .reduce((sum, c) => sum + parseFloat(c.amount), 0);
+    const fetchDashboardData = async () => {
+        try {
+            const [poolsData, statsData, walletData, activitiesData] = await Promise.all([
+                getPoolsList(),
+                getStats(),
+                api.get('/wallet/balance').catch(() => ({ data: { success: false, balance: { total: 0, allocated: 0, withdrawable: 0 } } })),
+                api.get('/wallet/transactions').catch(() => ({ data: { success: false, transactions: [] } }))
+            ]);
+            
+            if (poolsData.success) {
+                setPools(poolsData.pools || []);
+            }
+            
+            if (statsData.success) {
+                setStats(statsData.stats);
+            }
+            
+            if (walletData.data?.success) {
+                setWalletBalance(walletData.data.balance);
+            } else {
+                // Fallback: calculate from user data
+                if (user) {
+                    const userRes = await api.get('/auth/me');
+                    if (userRes.data.success) {
+                        const totalBalance = userRes.data.user.currentBalance || 0;
+                        // Get allocated from contributions
+                        const contributionsRes = await api.get(`/user/${user.id}/contributions`);
+                        let allocated = 0;
+                        if (contributionsRes.data.success) {
+                            allocated = contributionsRes.data.contributions
+                                .filter(c => c.status === 'confirmed')
+                                .reduce((sum, c) => sum + parseFloat(c.amount), 0);
+                        }
+                        setWalletBalance({
+                            total: totalBalance,
+                            allocated: allocated,
+                            withdrawable: totalBalance - allocated,
+                            pendingDeposits: 0,
+                            pendingWithdrawals: 0
+                        });
                     }
-                    setWalletBalance({
-                        total: totalBalance,
-                        allocated: allocated,
-                        withdrawable: totalBalance - allocated,
-                        pendingDeposits: 0,
-                        pendingWithdrawals: 0
-                    });
                 }
             }
-        }
-        
-        if (activitiesData.data?.success) {
-            setRecentActivities(activitiesData.data.transactions?.slice(0, 5) || []);
-        }
-        
-        if (user) {
-            const contributionsRes = await api.get(`/user/${user.id}/contributions`);
-            if (contributionsRes.data.success) {
-                setUserContributions(contributionsRes.data.contributions || []);
+            
+            if (activitiesData.data?.success) {
+                setRecentActivities(activitiesData.data.transactions?.slice(0, 5) || []);
             }
+            
+            if (user) {
+                const contributionsRes = await api.get(`/user/${user.id}/contributions`);
+                if (contributionsRes.data.success) {
+                    setUserContributions(contributionsRes.data.contributions || []);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+            toast.error('Failed to load dashboard data');
+        } finally {
+            setLoading(false);
         }
-    } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        toast.error('Failed to load dashboard data');
-    } finally {
-        setLoading(false);
-    }
-};
+    };
 
     const handleContribute = async (pool) => {
         setSelectedPool(pool);
@@ -121,43 +121,43 @@ const fetchDashboardData = async () => {
         setShowContributeModal(true);
     };
 
- const submitContribution = async () => {
-    if (!selectedPool) return;
-    
-    if (contributeAmount < selectedPool.min_contribution) {
-        toast.error(`Minimum contribution is $${selectedPool.min_contribution}`);
-        return;
-    }
-    
-    if (contributeAmount > selectedPool.max_contribution) {
-        toast.error(`Maximum contribution is $${selectedPool.max_contribution}`);
-        return;
-    }
-    
-    if (contributeAmount > walletBalance.withdrawable) {
-        toast.error(`Insufficient balance. Available: $${walletBalance.withdrawable.toLocaleString()}`);
-        return;
-    }
-    
-    try {
-        const response = await api.post('/wallet/allocate-to-pool', {
-            pool_id: selectedPool.id,
-            amount: contributeAmount
-        });
+    const submitContribution = async () => {
+        if (!selectedPool) return;
         
-        if (response.data.success) {
-            toast.success(response.data.message);
-            setShowContributeModal(false);
-            // Refresh all data to update balances and pool progress
-            fetchDashboardData();
-        } else {
-            toast.error(response.data.message || 'Failed to allocate funds');
+        if (contributeAmount < selectedPool.min_contribution) {
+            toast.error(`Minimum contribution is $${selectedPool.min_contribution}`);
+            return;
         }
-    } catch (error) {
-        console.error('Allocation error:', error);
-        toast.error(error.response?.data?.message || 'Failed to allocate funds');
-    }
-};
+        
+        if (contributeAmount > selectedPool.max_contribution) {
+            toast.error(`Maximum contribution is $${selectedPool.max_contribution}`);
+            return;
+        }
+        
+        if (contributeAmount > walletBalance.withdrawable) {
+            toast.error(`Insufficient balance. Available: $${walletBalance.withdrawable.toLocaleString()}`);
+            return;
+        }
+        
+        try {
+            const response = await api.post('/wallet/allocate-to-pool', {
+                pool_id: selectedPool.id,
+                amount: contributeAmount
+            });
+            
+            if (response.data.success) {
+                toast.success(response.data.message);
+                setShowContributeModal(false);
+                // Refresh all data to update balances and pool progress
+                fetchDashboardData();
+            } else {
+                toast.error(response.data.message || 'Failed to allocate funds');
+            }
+        } catch (error) {
+            console.error('Allocation error:', error);
+            toast.error(error.response?.data?.message || 'Failed to allocate funds');
+        }
+    };
 
     const getUserContributionForPool = (poolId) => {
         const contribution = userContributions.find(c => c.pool_id === poolId && c.status === 'confirmed');
@@ -186,11 +186,6 @@ const fetchDashboardData = async () => {
     const upcomingPools = pools.filter(pool => {
         const startDate = new Date(pool.start_date);
         return startDate > now && (pool.status === 'open' || pool.status === 'active');
-    });
-
-    const expiredPools = pools.filter(pool => {
-        const endDate = new Date(pool.end_date);
-        return endDate < now || pool.status === 'closed' || pool.status === 'settled';
     });
 
     if (loading) {

@@ -18,6 +18,7 @@ const History = () => {
 
     useEffect(() => {
         fetchHistory();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchHistory = async () => {
@@ -342,7 +343,7 @@ const History = () => {
                                                         </span>
                                                     </td>
                                                     <td className="p-4">{share.toFixed(2)}%</td>
-                                                </tr>
+                                                 </tr>
                                             );
                                         })}
                                     </tbody>
