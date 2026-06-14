@@ -1,0 +1,13 @@
+{
+  "buildCommand": "CI=false npm run build",
+  "outputDirectory": "build",
+  "devCommand": "npm start",
+  "installCommand": "npm install",
+  "framework": "create-react-app",
+  "env": {
+    "CI": "false",
+    "SKIP_PREFLIGHT_CHECK": "true",
+    "ESLINT_NO_DEV_ERRORS": "true",
+    "DISABLE_ESLINT_PLUGIN": "true"
+  }
+}
