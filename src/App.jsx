@@ -25,6 +25,14 @@ import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
 import VerifyEmail from './pages/VerifyEmail';
 
+import TestPage from './pages/TestPage';
+
+
+
+
+import TestTrades from './pages/TestTrades';
+
+
 
 // Import components
 import Navbar from './components/Navbar';
@@ -62,6 +70,14 @@ function App() {
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="*" element={<NotFound />} />
                 <Route path="/verify-email/:code" element={<VerifyEmail />} />
+
+
+                <Route path="/test/:poolId" element={<TestTrades />} />
+
+
+                <Route path="/test" element={<TestPage />} />
+
+
 
               </Routes>
             </main>

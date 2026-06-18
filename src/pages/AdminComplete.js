@@ -5,6 +5,16 @@ import SEO from '../components/SEO';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
+// Popular trading symbols with their current prices
+const popularSymbols = [
+    { symbol: 'EUR/USD', priceDecimals: 4, defaultVolume: 0.01 },
+    { symbol: 'GBP/USD', priceDecimals: 4, defaultVolume: 0.01 },
+    { symbol: 'USD/JPY', priceDecimals: 3, defaultVolume: 0.01 },
+    { symbol: 'XAU/USD', priceDecimals: 2, defaultVolume: 0.01 },
+    { symbol: 'BTC/USD', priceDecimals: 2, defaultVolume: 0.001 },
+    { symbol: 'ETH/USD', priceDecimals: 2, defaultVolume: 0.01 },
+];
+
 const AdminComplete = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -27,12 +37,13 @@ const AdminComplete = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
     const [tradeForm, setTradeForm] = useState({
-        symbol: '',
+        symbol: 'EUR/USD',
         direction: 'BUY',
-        volume: '',
+        volume: '0.01',
         open_price: '',
         stop_loss: '',
         take_profit: '',
+        entry_amount: '100.00',  // Default $100
         notes: ''
     });
     const [newPool, setNewPool] = useState({
@@ -156,19 +167,21 @@ const AdminComplete = () => {
                 volume: parseFloat(tradeForm.volume),
                 open_price: parseFloat(tradeForm.open_price),
                 stop_loss: tradeForm.stop_loss ? parseFloat(tradeForm.stop_loss) : null,
-                take_profit: tradeForm.take_profit ? parseFloat(tradeForm.take_profit) : null
+                take_profit: tradeForm.take_profit ? parseFloat(tradeForm.take_profit) : null,
+                entry_amount: tradeForm.entry_amount ? parseFloat(tradeForm.entry_amount) : null
             });
             
             if (response.data.success) {
-                toast.success('Trade opened successfully!');
+                toast.success('✅ Trade opened successfully!');
                 setShowTradeModal(false);
                 setTradeForm({
-                    symbol: '',
+                    symbol: 'EUR/USD',
                     direction: 'BUY',
-                    volume: '',
+                    volume: '0.01',
                     open_price: '',
                     stop_loss: '',
                     take_profit: '',
+                    entry_amount: '100.00',
                     notes: ''
                 });
                 fetchData();
@@ -180,13 +193,14 @@ const AdminComplete = () => {
 
     const handleCloseTrade = async (tradeId) => {
         const close_price = prompt('Enter closing price:');
-        const profit_loss = prompt('Enter profit/loss amount (+ for profit, - for loss):');
-        if (close_price && profit_loss) {
+        const exit_amount = prompt('Enter exit amount ($):');
+        
+        if (close_price && exit_amount) {
             try {
                 const response = await api.post(`/admin/trade-management/trade/${tradeId}/close`, {
                     close_price: parseFloat(close_price),
-                    profit_loss: parseFloat(profit_loss),
-                    notes: 'Closed by admin'
+                    exit_amount: parseFloat(exit_amount),
+                    closed_reason: 'Closed by admin'
                 });
                 if (response.data.success) {
                     toast.success(response.data.message);
@@ -808,15 +822,16 @@ const AdminComplete = () => {
                                     <h2 className="text-2xl font-bold mb-4">📈 Open Positions</h2>
                                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                                         <div className="overflow-x-auto">
-                                            <table className="w-full min-w-[1000px]">
+                                            <table className="w-full min-w-[1100px]">
                                                 <thead className="bg-gray-50 dark:bg-gray-700">
                                                     <tr>
                                                         <th className="p-4 text-left">Open Time</th>
                                                         <th className="p-4 text-left">Pool</th>
                                                         <th className="p-4 text-left">Symbol</th>
                                                         <th className="p-4 text-left">Direction</th>
-                                                        <th className="p-4 text-left">Volume</th>
+                                                        <th className="p-4 text-left">Lot Size</th>
                                                         <th className="p-4 text-left">Entry Price</th>
+                                                        <th className="p-4 text-left">Entry Amount</th>
                                                         <th className="p-4 text-left">Stop Loss</th>
                                                         <th className="p-4 text-left">Take Profit</th>
                                                         <th className="p-4 text-left">Current P&amp;L</th>
@@ -837,7 +852,8 @@ const AdminComplete = () => {
                                                                 </span>
                                                             </td>
                                                             <td className="p-4">{trade.volume}</td>
-                                                            <td className="p-4">${parseFloat(trade.open_price).toFixed(4)}</td>
+                                                            <td className="p-4">{parseFloat(trade.open_price).toFixed(4)}</td>
+                                                            <td className="p-4 font-semibold">${trade.entry_amount ? parseFloat(trade.entry_amount).toFixed(2) : '-'}</td>
                                                             <td className="p-4 text-red-600">{trade.stop_loss ? `$${parseFloat(trade.stop_loss).toFixed(4)}` : '-'}</td>
                                                             <td className="p-4 text-green-600">{trade.take_profit ? `$${parseFloat(trade.take_profit).toFixed(4)}` : '-'}</td>
                                                             <td className={`p-4 font-semibold ${(trade.current_pnl || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -865,7 +881,7 @@ const AdminComplete = () => {
                                 <h2 className="text-2xl font-bold mb-4">📋 Trade History</h2>
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                                     <div className="overflow-x-auto">
-                                        <table className="w-full min-w-[1000px]">
+                                        <table className="w-full min-w-[1200px]">
                                             <thead className="bg-gray-50 dark:bg-gray-700">
                                                 <tr>
                                                     <th className="p-4 text-left">Open Time</th>
@@ -875,6 +891,8 @@ const AdminComplete = () => {
                                                     <th className="p-4 text-left">Direction</th>
                                                     <th className="p-4 text-left">Entry</th>
                                                     <th className="p-4 text-left">Exit</th>
+                                                    <th className="p-4 text-left">Entry $</th>
+                                                    <th className="p-4 text-left">Exit $</th>
                                                     <th className="p-4 text-left">P&amp;L</th>
                                                     <th className="p-4 text-left">Status</th>
                                                 </tr>
@@ -893,8 +911,10 @@ const AdminComplete = () => {
                                                                 {trade.direction}
                                                             </span>
                                                         </td>
-                                                        <td className="p-4">${parseFloat(trade.open_price).toFixed(4)}</td>
-                                                        <td className="p-4">{trade.close_price ? `$${parseFloat(trade.close_price).toFixed(4)}` : '-'}</td>
+                                                        <td className="p-4">{parseFloat(trade.open_price).toFixed(4)}</td>
+                                                        <td className="p-4">{trade.close_price ? parseFloat(trade.close_price).toFixed(4) : '-'}</td>
+                                                        <td className="p-4 font-semibold">${trade.entry_amount ? parseFloat(trade.entry_amount).toFixed(2) : '-'}</td>
+                                                        <td className="p-4 font-semibold">${trade.exit_amount ? parseFloat(trade.exit_amount).toFixed(2) : '-'}</td>
                                                         <td className={`p-4 font-semibold ${(trade.profit_loss || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                                             {trade.profit_loss ? `${trade.profit_loss >= 0 ? '+' : ''}$${parseFloat(trade.profit_loss).toLocaleString()}` : '-'}
                                                         </td>
@@ -909,7 +929,7 @@ const AdminComplete = () => {
                                                 ))}
                                                 {trades.length === 0 && (
                                                     <tr>
-                                                        <td colSpan="9" className="p-8 text-center text-gray-500">No trades found</td>
+                                                        <td colSpan="11" className="p-8 text-center text-gray-500">No trades found</td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -920,15 +940,21 @@ const AdminComplete = () => {
                         </div>
                     )}
 
-                    {/* Add Trade Modal */}
+                    {/* Add Trade Modal - Updated with default $100 entry */}
                     {showTradeModal && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-2xl font-bold">Open New Trade Position</h2>
-                                    <button onClick={() => setShowTradeModal(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+                                    <h2 className="text-2xl font-bold">📊 Open New Trade</h2>
+                                    <button onClick={() => setShowTradeModal(false)} className="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
                                 </div>
                                 <form onSubmit={handleAddTrade} className="space-y-4">
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            💰 Trade Amount: <strong>$100</strong> • Volume: <strong>0.01 lots</strong>
+                                        </p>
+                                    </div>
+
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Select Pool</label>
                                         <select 
@@ -946,11 +972,13 @@ const AdminComplete = () => {
                                             ))}
                                         </select>
                                     </div>
+
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Symbol</label>
-                                        <input type="text" placeholder="e.g., EUR/USD, BTC/USD" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                        <input type="text" placeholder="e.g., EUR/USD, XAU/USD" className="w-full p-2 border rounded-lg dark:bg-gray-700"
                                             value={tradeForm.symbol} onChange={(e) => setTradeForm({...tradeForm, symbol: e.target.value})} required />
                                     </div>
+
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Direction</label>
                                         <select className="w-full p-2 border rounded-lg dark:bg-gray-700"
@@ -959,36 +987,60 @@ const AdminComplete = () => {
                                             <option value="SELL">📉 SELL (Short)</option>
                                         </select>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Volume</label>
-                                        <input type="number" step="0.01" placeholder="Volume" className="w-full p-2 border rounded-lg dark:bg-gray-700"
-                                            value={tradeForm.volume} onChange={(e) => setTradeForm({...tradeForm, volume: e.target.value})} required />
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Entry Amount ($)</label>
+                                            <input 
+                                                type="number" 
+                                                step="0.01"
+                                                className="w-full p-2 border rounded-lg dark:bg-gray-700 bg-gray-100"
+                                                value={tradeForm.entry_amount} 
+                                                onChange={(e) => setTradeForm({...tradeForm, entry_amount: e.target.value})} 
+                                                required 
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Volume (lots)</label>
+                                            <input 
+                                                type="number" 
+                                                step="0.001"
+                                                className="w-full p-2 border rounded-lg dark:bg-gray-700 bg-gray-100"
+                                                value={tradeForm.volume} 
+                                                onChange={(e) => setTradeForm({...tradeForm, volume: e.target.value})} 
+                                                required 
+                                            />
+                                        </div>
                                     </div>
+
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Open Price</label>
-                                        <input type="number" step="0.0001" placeholder="Open Price" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                        <input type="number" step="0.0001" placeholder="Enter current market price" className="w-full p-2 border rounded-lg dark:bg-gray-700"
                                             value={tradeForm.open_price} onChange={(e) => setTradeForm({...tradeForm, open_price: e.target.value})} required />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Stop Loss (Optional)</label>
-                                        <input type="number" step="0.0001" placeholder="Stop Loss" className="w-full p-2 border rounded-lg dark:bg-gray-700"
-                                            value={tradeForm.stop_loss} onChange={(e) => setTradeForm({...tradeForm, stop_loss: e.target.value})} />
-                                        <p className="text-xs text-gray-500 mt-1">Automatic exit if price hits this level</p>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Stop Loss</label>
+                                            <input type="number" step="0.0001" placeholder="Optional" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                                value={tradeForm.stop_loss} onChange={(e) => setTradeForm({...tradeForm, stop_loss: e.target.value})} />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Take Profit</label>
+                                            <input type="number" step="0.0001" placeholder="Optional" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                                value={tradeForm.take_profit} onChange={(e) => setTradeForm({...tradeForm, take_profit: e.target.value})} />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Take Profit (Optional)</label>
-                                        <input type="number" step="0.0001" placeholder="Take Profit" className="w-full p-2 border rounded-lg dark:bg-gray-700"
-                                            value={tradeForm.take_profit} onChange={(e) => setTradeForm({...tradeForm, take_profit: e.target.value})} />
-                                        <p className="text-xs text-gray-500 mt-1">Automatic profit taking at this level</p>
-                                    </div>
+
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Notes</label>
-                                        <textarea placeholder="Trade notes" rows="2" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                        <textarea placeholder="Add notes about this trade" rows="2" className="w-full p-2 border rounded-lg dark:bg-gray-700"
                                             value={tradeForm.notes} onChange={(e) => setTradeForm({...tradeForm, notes: e.target.value})} />
                                     </div>
-                                    <div className="flex justify-end space-x-3 pt-4">
-                                        <button type="button" onClick={() => setShowTradeModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
-                                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">Open Trade</button>
+
+                                    <div className="flex justify-end space-x-3 pt-4 border-t dark:border-gray-700">
+                                        <button type="button" onClick={() => setShowTradeModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">Cancel</button>
+                                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">✅ Open Trade</button>
                                     </div>
                                 </form>
                             </div>
