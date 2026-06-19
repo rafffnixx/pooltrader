@@ -31,6 +31,7 @@ import TestTrades from './pages/TestTrades';
 // Import components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop'; // ← ADD THIS
 
 // Import context
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -126,6 +127,7 @@ function App() {
                 <Router>
                     <div className="min-h-screen flex flex-col bg-[#0a0e0f]">
                         <Navbar />
+                        <ScrollToTop /> {/* ← ADD THIS LINE - Scrolls to top on page change */}
                         <main className="flex-grow">
                             <Routes>
                                 {/* Public Routes - Anyone can access */}

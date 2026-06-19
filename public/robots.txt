@@ -1,0 +1,10 @@
+# public/robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /wallet/
+Disallow: /contribute/
+Disallow: /pool/*/trades
+
+Sitemap: https://pooltrader.com/sitemap.xml
