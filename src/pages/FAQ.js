@@ -60,38 +60,53 @@ const FAQ = () => {
         <>
             <SEO title="FAQ - PoolTrader" description="Frequently asked questions about PoolTrader" />
             
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="min-h-screen bg-[#0a0e0f]">
                 <div className="container mx-auto px-4 py-8">
                     <div className="max-w-3xl mx-auto">
+                        {/* Back Button */}
                         <div className="mb-8">
-                            <Link to="/" className="text-blue-600 hover:text-blue-700">← Back to Home</Link>
+                            <Link to="/" className="text-[#00d4aa] hover:text-[#33ddbb] font-medium transition inline-flex items-center gap-2">
+                                ← Back to Home
+                            </Link>
                         </div>
                         
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-8 card-hover">
+                            {/* Header */}
                             <div className="text-center mb-8">
-                                <div className="inline-block p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-4">
+                                <div className="inline-block p-4 bg-gradient-to-r from-[#00d4aa] to-[#00b894] rounded-2xl mb-4 shadow-[0_0_30px_rgba(0,212,170,0.2)]">
                                     <span className="text-4xl">❓</span>
                                 </div>
-                                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                                <h1 className="text-3xl font-bold gradient-text">
                                     Frequently Asked Questions
                                 </h1>
-                                <p className="text-gray-600 dark:text-gray-400 mt-2">
+                                <p className="text-[#a0b4b8] mt-2">
                                     Find answers to common questions about PoolTrader
                                 </p>
                             </div>
                             
-                            <div className="space-y-4">
+                            {/* FAQ Accordion */}
+                            <div className="space-y-3">
                                 {faqs.map((faq, index) => (
-                                    <div key={index} className="border dark:border-gray-700 rounded-xl overflow-hidden">
+                                    <div key={index} className="border border-[#2a3538] rounded-xl overflow-hidden card-hover">
                                         <button
                                             onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                                            className="w-full text-left p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition flex justify-between items-center"
+                                            className={`w-full text-left p-4 transition flex justify-between items-center ${
+                                                openIndex === index 
+                                                    ? 'bg-[#1c2426] border-b border-[#00d4aa]/30' 
+                                                    : 'bg-[#1c2426] hover:bg-[#2a3538]'
+                                            }`}
                                         >
-                                            <span className="font-semibold">{faq.question}</span>
-                                            <span className="text-xl">{openIndex === index ? '−' : '+'}</span>
+                                            <span className={`font-semibold ${openIndex === index ? 'text-[#00d4aa]' : 'text-[#e8f0f0]'}`}>
+                                                {faq.question}
+                                            </span>
+                                            <span className={`text-2xl font-bold transition-transform duration-300 ${
+                                                openIndex === index ? 'text-[#00d4aa] rotate-180' : 'text-[#a0b4b8]'
+                                            }`}>
+                                                {openIndex === index ? '−' : '+'}
+                                            </span>
                                         </button>
                                         {openIndex === index && (
-                                            <div className="p-4 text-gray-600 dark:text-gray-400 border-t dark:border-gray-700">
+                                            <div className="p-4 text-[#a0b4b8] bg-[#161c1e] border-t border-[#2a3538] animate-fade-in">
                                                 {faq.answer}
                                             </div>
                                         )}
@@ -99,9 +114,13 @@ const FAQ = () => {
                                 ))}
                             </div>
                             
-                            <div className="mt-8 text-center pt-6 border-t dark:border-gray-700">
-                                <p className="text-gray-600 dark:text-gray-400">
-                                    Still have questions? <Link to="/contact" className="text-blue-600 hover:text-blue-700">Contact us</Link>
+                            {/* Bottom CTA */}
+                            <div className="mt-8 text-center pt-6 border-t border-[#2a3538]">
+                                <p className="text-[#a0b4b8]">
+                                    Still have questions?{' '}
+                                    <Link to="/contact" className="text-[#00d4aa] hover:text-[#33ddbb] font-medium transition">
+                                        Contact us
+                                    </Link>
                                 </p>
                             </div>
                         </div>

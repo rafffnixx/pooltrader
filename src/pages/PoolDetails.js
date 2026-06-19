@@ -17,43 +17,13 @@ const PoolDetails = () => {
     const [contributeAmount, setContributeAmount] = useState(1000);
     const [walletBalance, setWalletBalance] = useState({ withdrawable: 0 });
 
-useEffect(() => {
-    const fetchPoolDetails = async () => {
-        try {
-            const response = await api.get(`/pool/${id}`);
-            if (response.data.success) {
-                setPool(response.data.pool);
-                setContributions(response.data.contributions || []);
-                setTrades(response.data.trades || []);
-            } else {
-                toast.error('Pool not found');
-                navigate('/dashboard');
-            }
-        } catch (error) {
-            console.error('Error fetching pool details:', error);
-            toast.error('Failed to load pool details');
-            navigate('/dashboard');
-        } finally {
-            setLoading(false);
-        }
+    // Helper function to format currency
+    const formatCurrency = (value) => {
+        if (value === null || value === undefined) return '-';
+        const num = parseFloat(value);
+        if (isNaN(num)) return '-';
+        return `$${num.toLocaleString()}`;
     };
-
-    const fetchWalletBalance = async () => {
-        try {
-            const response = await api.get('/wallet/balance');
-            if (response.data.success) {
-                setWalletBalance(response.data.balance);
-            }
-        } catch (error) {
-            console.error('Error fetching wallet balance:', error);
-        }
-    };
-
-    fetchPoolDetails();
-    if (user) {
-        fetchWalletBalance();
-    }
-}, [id, user, navigate]); // Remove fetchPoolDetails and user from deps, keep only id
 
     const fetchPoolDetails = async () => {
         try {
@@ -76,6 +46,7 @@ useEffect(() => {
     };
 
     const fetchWalletBalance = async () => {
+        if (!user) return;
         try {
             const response = await api.get('/wallet/balance');
             if (response.data.success) {
@@ -85,6 +56,13 @@ useEffect(() => {
             console.error('Error fetching wallet balance:', error);
         }
     };
+
+    useEffect(() => {
+        fetchPoolDetails();
+        if (user) {
+            fetchWalletBalance();
+        }
+    }, [id, user]);
 
     const handleContribute = async () => {
         if (!pool) return;
@@ -113,8 +91,8 @@ useEffect(() => {
             if (response.data.success) {
                 toast.success(response.data.message);
                 setShowContributeModal(false);
-                fetchPoolDetails();
-                fetchWalletBalance();
+                await fetchPoolDetails();
+                await fetchWalletBalance();
             }
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to allocate funds');
@@ -123,10 +101,10 @@ useEffect(() => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+            <div className="flex justify-center items-center h-screen bg-[#0a0e0f]">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-gray-400">Loading pool details...</p>
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#00d4aa] mx-auto mb-4"></div>
+                    <p className="text-[#a0b4b8]">Loading pool details...</p>
                 </div>
             </div>
         );
@@ -134,11 +112,12 @@ useEffect(() => {
 
     if (!pool) {
         return (
-            <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+            <div className="flex justify-center items-center h-screen bg-[#0a0e0f]">
                 <div className="text-center">
-                    <p className="text-gray-400 text-lg">Pool not found</p>
-                    <Link to="/dashboard" className="text-blue-500 mt-4 inline-block hover:text-blue-400">
-                        Back to Dashboard
+                    <div className="text-6xl mb-4">🔍</div>
+                    <p className="text-[#a0b4b8] text-lg">Pool not found</p>
+                    <Link to="/dashboard" className="text-[#00d4aa] hover:text-[#33ddbb] mt-4 inline-block font-medium transition">
+                        Back to Dashboard →
                     </Link>
                 </div>
             </div>
@@ -154,92 +133,95 @@ useEffect(() => {
         <>
             <SEO title={`${pool.name} - PoolTrader`} description={`View details for ${pool.name}`} />
             
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="min-h-screen bg-[#0a0e0f]">
                 <div className="container mx-auto px-4 py-8">
+                    {/* Back Button */}
                     <button 
                         onClick={() => navigate('/dashboard')}
-                        className="mb-6 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-2"
+                        className="text-[#00d4aa] hover:text-[#33ddbb] mb-6 flex items-center gap-2 font-medium transition"
                     >
                         ← Back to Dashboard
                     </button>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-8">
+                    {/* Pool Header */}
+                    <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 mb-8 card-hover">
                         <div className="flex justify-between items-start flex-wrap gap-4">
                             <div>
-                                <h1 className="text-3xl font-bold dark:text-white">{pool.name}</h1>
-                                <p className="text-gray-500 dark:text-gray-400 mt-2">{pool.description || 'No description provided'}</p>
+                                <h1 className="text-3xl font-bold text-[#e8f0f0]">{pool.name}</h1>
+                                <p className="text-[#a0b4b8] mt-2">{pool.description || 'No description provided'}</p>
                                 <div className="flex gap-4 mt-4">
-                                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                        pool.status === 'open' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800'
-                                    }`}>
+                                    <span className={`badge ${pool.status === 'open' || pool.status === 'active' ? 'badge-success' : 'badge-gray'}`}>
                                         {pool.status.toUpperCase()}
                                     </span>
-                                    <span className="text-gray-500 dark:text-gray-400 text-sm">{daysLeft} days remaining</span>
+                                    <span className="text-[#6a7e82] text-sm">{daysLeft} days remaining</span>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Trading Period</p>
-                                <p className="font-semibold dark:text-white">
+                                <p className="text-sm text-[#6a7e82]">Trading Period</p>
+                                <p className="font-semibold text-[#e8f0f0]">
                                     {new Date(pool.start_date).toLocaleDateString()} - {new Date(pool.end_date).toLocaleDateString()}
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center">
-                            <p className="text-gray-500 dark:text-gray-400 text-sm">Target Amount</p>
-                            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">${parseFloat(pool.total_target).toLocaleString()}</p>
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div className="stat-card">
+                            <div className="stat-label">Target Amount</div>
+                            <div className="stat-value text-[#00d4aa]">{formatCurrency(pool.total_target)}</div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center">
-                            <p className="text-gray-500 dark:text-gray-400 text-sm">Current Raised</p>
-                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">${parseFloat(pool.current_total).toLocaleString()}</p>
+                        <div className="stat-card">
+                            <div className="stat-label">Current Raised</div>
+                            <div className="stat-value text-[#00d4aa]">{formatCurrency(pool.current_total)}</div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center">
-                            <p className="text-gray-500 dark:text-gray-400 text-sm">Progress</p>
-                            <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{progress.toFixed(1)}%</p>
+                        <div className="stat-card">
+                            <div className="stat-label">Progress</div>
+                            <div className="stat-value text-[#ffd93d]">{progress.toFixed(1)}%</div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 text-center">
-                            <p className="text-gray-500 dark:text-gray-400 text-sm">Total Investors</p>
-                            <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{contributions.length}</p>
+                        <div className="stat-card">
+                            <div className="stat-label">Total Investors</div>
+                            <div className="stat-value text-[#4aa0ff]">{contributions.length}</div>
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
-                        <h2 className="text-xl font-bold mb-4 dark:text-white">Funding Progress</h2>
+                    {/* Funding Progress */}
+                    <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 mb-8 card-hover">
+                        <h2 className="text-xl font-bold text-[#e8f0f0] mb-4">Funding Progress</h2>
                         <div className="flex justify-between text-sm mb-2">
-                            <span className="dark:text-gray-300">${parseFloat(pool.current_total).toLocaleString()} raised</span>
-                            <span className="dark:text-gray-300">Target: ${parseFloat(pool.total_target).toLocaleString()}</span>
+                            <span className="text-[#a0b4b8]">{formatCurrency(pool.current_total)} raised</span>
+                            <span className="text-[#a0b4b8]">Target: {formatCurrency(pool.total_target)}</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700">
+                        <div className="w-full bg-[#1c2426] rounded-full h-3">
                             <div 
-                                className="bg-gradient-to-r from-blue-600 to-purple-600 h-4 rounded-full transition-all duration-500"
+                                className="bg-gradient-to-r from-[#00d4aa] to-[#00b894] h-3 rounded-full transition-all duration-500"
                                 style={{ width: `${progress}%` }}
                             ></div>
                         </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-8 mb-8">
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold mb-4 dark:text-white">Your Investment</h2>
+                    {/* Investment Section */}
+                    <div className="grid md:grid-cols-2 gap-6 mb-8">
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 card-hover">
+                            <h2 className="text-xl font-bold text-[#e8f0f0] mb-4">Your Investment</h2>
                             {userContribution ? (
                                 <div>
-                                    <p className="text-3xl font-bold text-green-600 dark:text-green-400">${parseFloat(userContribution.amount).toLocaleString()}</p>
-                                    <p className="text-gray-500 dark:text-gray-400 mt-2">Share: {userShare.toFixed(2)}% of pool</p>
+                                    <p className="text-3xl font-bold text-[#00d4aa]">{formatCurrency(userContribution.amount)}</p>
+                                    <p className="text-[#a0b4b8] mt-2">Share: {userShare.toFixed(2)}% of pool</p>
                                     <button 
                                         onClick={() => setShowContributeModal(true)}
-                                        className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                                        className="btn btn-primary w-full mt-4"
                                     >
                                         Add More
                                     </button>
                                 </div>
                             ) : (
                                 <div>
-                                    <p className="text-gray-500 dark:text-gray-400">You haven't invested in this pool yet</p>
-                                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Min: ${parseFloat(pool.min_contribution).toLocaleString()}</p>
+                                    <p className="text-[#a0b4b8]">You haven't invested in this pool yet</p>
+                                    <p className="text-sm text-[#6a7e82] mt-1">Min: {formatCurrency(pool.min_contribution)}</p>
                                     <button 
                                         onClick={() => setShowContributeModal(true)}
-                                        className="mt-4 w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition"
+                                        className="btn btn-success w-full mt-4"
                                     >
                                         Invest Now
                                     </button>
@@ -247,45 +229,60 @@ useEffect(() => {
                             )}
                         </div>
 
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold mb-4 dark:text-white">Pool Terms</h2>
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 card-hover">
+                            <h2 className="text-xl font-bold text-[#e8f0f0] mb-4">Pool Terms</h2>
                             <div className="space-y-3">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-500 dark:text-gray-400">Min Contribution</span>
-                                    <span className="font-semibold dark:text-white">${parseFloat(pool.min_contribution).toLocaleString()}</span>
+                                <div className="flex justify-between py-2 border-b border-[#2a3538]">
+                                    <span className="text-[#a0b4b8]">Min Contribution</span>
+                                    <span className="font-semibold text-[#e8f0f0]">{formatCurrency(pool.min_contribution)}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-500 dark:text-gray-400">Max Contribution</span>
-                                    <span className="font-semibold dark:text-white">${parseFloat(pool.max_contribution).toLocaleString()}</span>
+                                <div className="flex justify-between py-2 border-b border-[#2a3538]">
+                                    <span className="text-[#a0b4b8]">Max Contribution</span>
+                                    <span className="font-semibold text-[#e8f0f0]">{formatCurrency(pool.max_contribution)}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-500 dark:text-gray-400">Manager Fee</span>
-                                    <span className="font-semibold dark:text-white">{pool.manager_fee_percent}% of profits</span>
+                                <div className="flex justify-between py-2">
+                                    <span className="text-[#a0b4b8]">Manager Fee</span>
+                                    <span className="font-semibold text-[#e8f0f0]">{pool.manager_fee_percent}% of profits</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    {/* Top Contributors */}
                     {contributions.length > 0 && (
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
-                            <h2 className="text-xl font-bold mb-4 dark:text-white">🏆 Top Contributors</h2>
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 mb-8 card-hover">
+                            <h2 className="text-xl font-bold text-[#e8f0f0] mb-4">🏆 Top Contributors</h2>
                             <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-gray-50 dark:bg-gray-700">
+                                <table className="table-dark">
+                                    <thead>
                                         <tr>
-                                            <th className="p-4 text-left dark:text-white">Rank</th>
-                                            <th className="p-4 text-left dark:text-white">Investor</th>
-                                            <th className="p-4 text-left dark:text-white">Amount</th>
-                                            <th className="p-4 text-left dark:text-white">Share %</th>
+                                            <th>Rank</th>
+                                            <th>Investor</th>
+                                            <th>Amount</th>
+                                            <th>Share %</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {[...contributions].sort((a, b) => b.amount - a.amount).map((c, idx) => (
-                                            <tr key={c.id} className="border-b dark:border-gray-700">
-                                                <td className="p-4 dark:text-gray-300">#{idx + 1}</td>
-                                                <td className="p-4 font-medium dark:text-white">{c.full_name || `User ${c.user_id}`} {c.user_id === user?.id && <span className="text-blue-500 text-sm ml-1">(You)</span>}</td>
-                                                <td className="p-4 font-semibold text-green-600 dark:text-green-400">${parseFloat(c.amount).toLocaleString()}</td>
-                                                <td className="p-4 dark:text-gray-300">{((parseFloat(c.amount) / parseFloat(pool.current_total)) * 100).toFixed(2)}%</td>
+                                        {[...contributions]
+                                            .sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount))
+                                            .map((c, idx) => (
+                                            <tr key={c.id} className="hover:bg-[#1c2426] transition">
+                                                <td className="p-4">
+                                                    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm ${
+                                                        idx === 0 ? 'bg-[#ffd93d] text-[#0a0e0f]' :
+                                                        idx === 1 ? 'bg-[#a0b4b8] text-[#0a0e0f]' :
+                                                        idx === 2 ? 'bg-[#ff6b6b] text-white' :
+                                                        'bg-[#1c2426] text-[#a0b4b8]'
+                                                    }`}>
+                                                        #{idx + 1}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4 font-medium text-[#e8f0f0]">
+                                                    {c.full_name || `User ${c.user_id}`} 
+                                                    {c.user_id === user?.id && <span className="text-[#00d4aa] text-sm ml-1">(You)</span>}
+                                                </td>
+                                                <td className="p-4 font-semibold text-[#00d4aa]">{formatCurrency(c.amount)}</td>
+                                                <td className="p-4 text-[#a0b4b8]">{((parseFloat(c.amount) / parseFloat(pool.current_total)) * 100).toFixed(2)}%</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -294,37 +291,34 @@ useEffect(() => {
                         </div>
                     )}
 
+                    {/* Recent Trades */}
                     {trades.length > 0 && (
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold mb-4 dark:text-white">📊 Recent Trades</h2>
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 card-hover">
+                            <h2 className="text-xl font-bold text-[#e8f0f0] mb-4">📊 Recent Trades</h2>
                             <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-gray-50 dark:bg-gray-700">
+                                <table className="table-dark">
+                                    <thead>
                                         <tr>
-                                            <th className="p-4 text-left dark:text-white">Date</th>
-                                            <th className="p-4 text-left dark:text-white">Symbol</th>
-                                            <th className="p-4 text-left dark:text-white">Direction</th>
-                                            <th className="p-4 text-left dark:text-white">Entry</th>
-                                            <th className="p-4 text-left dark:text-white">Status</th>
+                                            <th>Date</th>
+                                            <th>Symbol</th>
+                                            <th>Direction</th>
+                                            <th>Entry</th>
+                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {trades.map((trade) => (
-                                            <tr key={trade.id} className="border-b dark:border-gray-700">
-                                                <td className="p-4 dark:text-gray-300">{new Date(trade.open_time).toLocaleDateString()}</td>
-                                                <td className="p-4 font-medium dark:text-white">{trade.symbol}</td>
+                                            <tr key={trade.id} className="hover:bg-[#1c2426] transition">
+                                                <td className="p-4 text-sm text-[#a0b4b8]">{new Date(trade.open_time).toLocaleDateString()}</td>
+                                                <td className="p-4 font-medium text-[#e8f0f0]">{trade.symbol}</td>
                                                 <td className="p-4">
-                                                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                                        trade.direction === 'BUY' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                                                    }`}>
+                                                    <span className={`badge ${trade.direction === 'BUY' ? 'badge-success' : 'badge-danger'}`}>
                                                         {trade.direction}
                                                     </span>
                                                 </td>
-                                                <td className="p-4 dark:text-gray-300">${parseFloat(trade.open_price).toFixed(4)}</td>
+                                                <td className="p-4 text-[#e8f0f0]">${parseFloat(trade.open_price).toFixed(4)}</td>
                                                 <td className="p-4">
-                                                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                                        trade.status === 'open' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-gray-100 text-gray-800'
-                                                    }`}>
+                                                    <span className={`badge ${trade.status === 'open' ? 'badge-warning' : 'badge-gray'}`}>
                                                         {trade.status}
                                                     </span>
                                                 </td>
@@ -336,20 +330,21 @@ useEffect(() => {
                         </div>
                     )}
 
+                    {/* Contribute Modal */}
                     {showContributeModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+                        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                            <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 max-w-md w-full modal-dark">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-2xl font-bold dark:text-white">Invest in {pool.name}</h2>
-                                    <button onClick={() => setShowContributeModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400">✕</button>
+                                    <h2 className="text-2xl font-bold text-[#e8f0f0]">Invest in {pool.name}</h2>
+                                    <button onClick={() => setShowContributeModal(false)} className="text-[#a0b4b8] hover:text-[#e8f0f0] text-2xl transition">✕</button>
                                 </div>
                                 <div className="space-y-4">
-                                    <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">Your Available Balance</p>
-                                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">${walletBalance.withdrawable?.toLocaleString() || 0}</p>
+                                    <div className="p-3 bg-[#1c2426] rounded-lg border border-[#00d4aa]/20">
+                                        <p className="text-sm text-[#a0b4b8]">Your Available Balance</p>
+                                        <p className="text-2xl font-bold text-[#00d4aa]">{formatCurrency(walletBalance.withdrawable)}</p>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-1 dark:text-white">Amount to Invest ($)</label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Amount to Invest ($)</label>
                                         <input 
                                             type="number" 
                                             value={contributeAmount} 
@@ -357,24 +352,30 @@ useEffect(() => {
                                             min={pool.min_contribution}
                                             max={Math.min(pool.max_contribution, walletBalance.withdrawable)}
                                             step="100"
-                                            className="w-full p-3 border rounded-lg text-lg font-semibold dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            className="input-dark text-lg font-semibold"
                                         />
-                                        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            <span>Min: ${parseFloat(pool.min_contribution).toLocaleString()}</span>
-                                            <span>Max: ${parseFloat(pool.max_contribution).toLocaleString()}</span>
+                                        <div className="flex justify-between text-xs text-[#6a7e82] mt-1">
+                                            <span>Min: {formatCurrency(pool.min_contribution)}</span>
+                                            <span>Max: {formatCurrency(pool.max_contribution)}</span>
                                         </div>
                                     </div>
-                                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">Your Share After Investment</p>
-                                        <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                                    <div className="bg-[#1c2426] p-3 rounded-lg">
+                                        <p className="text-sm text-[#a0b4b8]">Your Share After Investment</p>
+                                        <p className="text-xl font-bold text-[#00d4aa]">
                                             {((contributeAmount + parseFloat(pool.current_total)) > 0 
                                                 ? (contributeAmount / (contributeAmount + parseFloat(pool.current_total))) * 100 
                                                 : 0).toFixed(2)}%
                                         </p>
                                     </div>
+                                    <div className="bg-[#1c2426] p-3 rounded-lg border-l-4 border-[#ffd93d]">
+                                        <p className="text-xs text-[#a0b4b8]">
+                                            ⚡ Funds will be allocated from your wallet balance to this pool.
+                                            Your withdrawable balance will decrease by this amount.
+                                        </p>
+                                    </div>
                                     <div className="flex gap-3 pt-4">
-                                        <button onClick={() => setShowContributeModal(false)} className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">Cancel</button>
-                                        <button onClick={handleContribute} className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700">Confirm Investment</button>
+                                        <button onClick={() => setShowContributeModal(false)} className="flex-1 btn btn-outline">Cancel</button>
+                                        <button onClick={handleContribute} className="flex-1 btn btn-success">Confirm Investment</button>
                                     </div>
                                 </div>
                             </div>

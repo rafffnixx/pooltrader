@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 
 const Wallet = () => {
-    // Removed unused currentUser variable
     const [balance, setBalance] = useState({
         total: 0,
         allocated: 0,
@@ -29,6 +28,14 @@ const Wallet = () => {
         walletAddress: ''
     });
     const [loading, setLoading] = useState(true);
+
+    // Helper function to format currency
+    const formatCurrency = (value) => {
+        if (value === null || value === undefined) return '-';
+        const num = parseFloat(value);
+        if (isNaN(num)) return '-';
+        return `$${num.toLocaleString()}`;
+    };
 
     useEffect(() => {
         fetchWalletData();
@@ -187,51 +194,51 @@ const Wallet = () => {
             case 'mpesa':
                 return (
                     <div>
-                        <label className="block text-sm font-medium mb-1">M-Pesa Phone Number</label>
+                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">M-Pesa Phone Number</label>
                         <input
                             type="tel"
                             value={paymentDetails.phoneNumber}
                             onChange={(e) => setPaymentDetails({...paymentDetails, phoneNumber: e.target.value})}
                             placeholder="0712345678"
-                            className="w-full p-3 border rounded-lg"
+                            className="input-dark"
                             required
                         />
-                        <p className="text-xs text-gray-500 mt-1">You will receive a payment request on this number</p>
+                        <p className="text-xs text-[#6a7e82] mt-1">You will receive a payment request on this number</p>
                     </div>
                 );
             case 'bank_transfer':
                 return (
                     <div className="space-y-3">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Account Name</label>
+                            <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Account Name</label>
                             <input
                                 type="text"
                                 value={paymentDetails.accountName}
                                 onChange={(e) => setPaymentDetails({...paymentDetails, accountName: e.target.value})}
                                 placeholder="John Doe"
-                                className="w-full p-3 border rounded-lg"
+                                className="input-dark"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">Account Number</label>
+                            <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Account Number</label>
                             <input
                                 type="text"
                                 value={paymentDetails.accountNumber}
                                 onChange={(e) => setPaymentDetails({...paymentDetails, accountNumber: e.target.value})}
                                 placeholder="1234567890"
-                                className="w-full p-3 border rounded-lg"
+                                className="input-dark"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">Bank Name (Optional)</label>
+                            <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Bank Name (Optional)</label>
                             <input
                                 type="text"
                                 value={paymentDetails.bankName}
                                 onChange={(e) => setPaymentDetails({...paymentDetails, bankName: e.target.value})}
                                 placeholder="Chase Bank"
-                                className="w-full p-3 border rounded-lg"
+                                className="input-dark"
                             />
                         </div>
                     </div>
@@ -239,16 +246,16 @@ const Wallet = () => {
             case 'usdt':
                 return (
                     <div>
-                        <label className="block text-sm font-medium mb-1">USDT Wallet Address (ERC-20)</label>
+                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">USDT Wallet Address (ERC-20)</label>
                         <input
                             type="text"
                             value={paymentDetails.walletAddress}
                             onChange={(e) => setPaymentDetails({...paymentDetails, walletAddress: e.target.value})}
                             placeholder="0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb5"
-                            className="w-full p-3 border rounded-lg"
+                            className="input-dark"
                             required
                         />
-                        <p className="text-xs text-gray-500 mt-1">Make sure to use ERC-20 network</p>
+                        <p className="text-xs text-[#6a7e82] mt-1">Make sure to use ERC-20 network</p>
                     </div>
                 );
             default:
@@ -258,10 +265,10 @@ const Wallet = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+            <div className="flex justify-center items-center h-screen bg-[#0a0e0f]">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-gray-400">Loading your wallet...</p>
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#00d4aa] mx-auto mb-4"></div>
+                    <p className="text-[#a0b4b8]">Loading your wallet...</p>
                 </div>
             </div>
         );
@@ -271,17 +278,17 @@ const Wallet = () => {
         <>
             <SEO title="Wallet - PoolTrader" description="Manage your funds and withdrawals" />
             
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="min-h-screen bg-[#0a0e0f]">
                 <div className="container mx-auto px-4 py-8">
-                    {/* Header with Story */}
+                    {/* Header */}
                     <div className="mb-8 text-center">
-                        <div className="inline-block p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-4">
+                        <div className="inline-block p-4 bg-gradient-to-r from-[#00d4aa] to-[#00b894] rounded-2xl mb-4 shadow-[0_0_30px_rgba(0,212,170,0.2)]">
                             <span className="text-4xl">💰</span>
                         </div>
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <h1 className="text-4xl font-bold gradient-text">
                             Your Trading Wallet
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">
+                        <p className="text-[#a0b4b8] mt-2 max-w-2xl mx-auto">
                             Manage your funds, track deposits, and withdraw your profits. 
                             Your money is safe and ready for trading when you are.
                         </p>
@@ -289,34 +296,34 @@ const Wallet = () => {
 
                     {/* Balance Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                        <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl shadow-xl p-4 text-white">
-                            <p className="text-blue-100 text-sm">Total Balance</p>
-                            <p className="text-2xl font-bold mt-1">${balance.total.toLocaleString()}</p>
-                            <p className="text-blue-200 text-xs mt-1">💰 Total funds</p>
+                        <div className="stat-card text-center border-t-4 border-[#00d4aa]">
+                            <p className="text-[#6a7e82] text-sm">Total Balance</p>
+                            <p className="text-3xl font-bold text-[#e8f0f0]">{formatCurrency(balance.total)}</p>
+                            <p className="text-[#6a7e82] text-xs mt-1">💰 Total funds</p>
                         </div>
                         
-                        <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl shadow-xl p-4 text-white">
-                            <p className="text-purple-100 text-sm">Allocated to Pools</p>
-                            <p className="text-2xl font-bold mt-1">${balance.allocated.toLocaleString()}</p>
-                            <p className="text-purple-200 text-xs mt-1">📊 Invested</p>
+                        <div className="stat-card text-center border-t-4 border-[#4aa0ff]">
+                            <p className="text-[#6a7e82] text-sm">Allocated to Pools</p>
+                            <p className="text-3xl font-bold text-[#4aa0ff]">{formatCurrency(balance.allocated)}</p>
+                            <p className="text-[#6a7e82] text-xs mt-1">📊 Invested</p>
                         </div>
                         
-                        <div className="bg-gradient-to-br from-green-500 to-green-700 rounded-2xl shadow-xl p-4 text-white">
-                            <p className="text-green-100 text-sm">Withdrawable</p>
-                            <p className="text-2xl font-bold mt-1">${balance.withdrawable.toLocaleString()}</p>
-                            <p className="text-green-200 text-xs mt-1">💵 Available</p>
+                        <div className="stat-card text-center border-t-4 border-[#00d4aa]">
+                            <p className="text-[#6a7e82] text-sm">Withdrawable</p>
+                            <p className="text-3xl font-bold text-[#00d4aa]">{formatCurrency(balance.withdrawable)}</p>
+                            <p className="text-[#6a7e82] text-xs mt-1">💵 Available</p>
                         </div>
                         
-                        <div className="bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-2xl shadow-xl p-4 text-white">
-                            <p className="text-yellow-100 text-sm">Pending Deposits</p>
-                            <p className="text-2xl font-bold mt-1">${balance.pendingDeposits.toLocaleString()}</p>
-                            <p className="text-yellow-200 text-xs mt-1">⏳ Awaiting confirmation</p>
+                        <div className="stat-card text-center border-t-4 border-[#ffd93d]">
+                            <p className="text-[#6a7e82] text-sm">Pending Deposits</p>
+                            <p className="text-3xl font-bold text-[#ffd93d]">{formatCurrency(balance.pendingDeposits)}</p>
+                            <p className="text-[#6a7e82] text-xs mt-1">⏳ Awaiting confirmation</p>
                         </div>
                         
-                        <div className="bg-gradient-to-br from-red-500 to-red-700 rounded-2xl shadow-xl p-4 text-white">
-                            <p className="text-red-100 text-sm">Pending Withdrawals</p>
-                            <p className="text-2xl font-bold mt-1">${balance.pendingWithdrawals.toLocaleString()}</p>
-                            <p className="text-red-200 text-xs mt-1">📤 Processing</p>
+                        <div className="stat-card text-center border-t-4 border-[#ff6b6b]">
+                            <p className="text-[#6a7e82] text-sm">Pending Withdrawals</p>
+                            <p className="text-3xl font-bold text-[#ff6b6b]">{formatCurrency(balance.pendingWithdrawals)}</p>
+                            <p className="text-[#6a7e82] text-xs mt-1">📤 Processing</p>
                         </div>
                     </div>
 
@@ -327,7 +334,7 @@ const Wallet = () => {
                                 setShowDepositModal(true);
                                 resetPaymentDetails();
                             }}
-                            className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-semibold hover:from-green-700 hover:to-green-800 transition transform hover:scale-105 shadow-lg"
+                            className="flex-1 btn btn-success btn-lg"
                         >
                             💰 Deposit Funds
                         </button>
@@ -336,79 +343,79 @@ const Wallet = () => {
                                 setShowWithdrawModal(true);
                                 resetPaymentDetails();
                             }}
-                            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition transform hover:scale-105 shadow-lg"
+                            className="flex-1 btn btn-primary btn-lg"
                         >
                             💸 Withdraw Funds
                         </button>
                         <Link 
                             to="/dashboard"
-                            className="flex-1 bg-gradient-to-r from-gray-600 to-gray-700 text-white py-3 rounded-xl font-semibold hover:from-gray-700 hover:to-gray-800 transition text-center"
+                            className="flex-1 btn btn-outline btn-lg text-center"
                         >
                             📊 Go to Dashboard
                         </Link>
                     </div>
 
                     {/* How It Works Section */}
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
-                        <h2 className="text-xl font-bold mb-4 flex items-center">
+                    <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 mb-8 card-hover">
+                        <h2 className="text-xl font-bold text-[#e8f0f0] mb-4 flex items-center">
                             <span className="mr-2">💡</span> How It Works
                         </h2>
                         <div className="grid md:grid-cols-3 gap-4 text-sm">
-                            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                                <div className="font-bold text-blue-600">1. Deposit Funds</div>
-                                <p>Request a deposit with your preferred payment method. Admin will confirm and funds will be added to your wallet.</p>
+                            <div className="p-3 bg-[#1c2426] rounded-lg border border-[#00d4aa]/20">
+                                <div className="font-bold text-[#00d4aa]">1. Deposit Funds</div>
+                                <p className="text-[#a0b4b8]">Request a deposit with your preferred payment method. Admin will confirm and funds will be added to your wallet.</p>
                             </div>
-                            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                                <div className="font-bold text-green-600">2. Allocate to Pools</div>
-                                <p>Use your withdrawable balance to invest in active trading pools.</p>
+                            <div className="p-3 bg-[#1c2426] rounded-lg border border-[#00d4aa]/20">
+                                <div className="font-bold text-[#00d4aa]">2. Allocate to Pools</div>
+                                <p className="text-[#a0b4b8]">Use your withdrawable balance to invest in active trading pools.</p>
                             </div>
-                            <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                                <div className="font-bold text-purple-600">3. Withdraw Profits</div>
-                                <p>Request withdrawal of your withdrawable balance anytime.</p>
+                            <div className="p-3 bg-[#1c2426] rounded-lg border border-[#00d4aa]/20">
+                                <div className="font-bold text-[#00d4aa]">3. Withdraw Profits</div>
+                                <p className="text-[#a0b4b8]">Request withdrawal of your withdrawable balance anytime.</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Recent Transactions */}
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mb-8">
-                        <div className="p-6 border-b dark:border-gray-700">
-                            <h2 className="text-xl font-bold flex items-center">
+                    <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl overflow-hidden mb-8 card-hover">
+                        <div className="p-6 border-b border-[#2a3538]">
+                            <h2 className="text-xl font-bold text-[#e8f0f0] flex items-center">
                                 <span className="mr-2">📋</span> Recent Transactions
                             </h2>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gray-50 dark:bg-gray-700">
+                            <table className="table-dark">
+                                <thead>
                                     <tr>
-                                        <th className="p-4 text-left">Date</th>
-                                        <th className="p-4 text-left">Type</th>
-                                        <th className="p-4 text-left">Amount</th>
-                                        <th className="p-4 text-left">Method</th>
-                                        <th className="p-4 text-left">Status</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Method</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {transactions.map((t) => (
-                                        <tr key={t.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                            <td className="p-4">{new Date(t.created_at).toLocaleDateString()}</td>
+                                        <tr key={t.id} className="hover:bg-[#1c2426] transition">
+                                            <td className="p-4 text-[#a0b4b8]">{new Date(t.created_at).toLocaleDateString()}</td>
                                             <td className="p-4 capitalize">
-                                                <span className={`px-2 py-1 rounded text-xs ${
-                                                    t.type === 'deposit' ? 'bg-green-100 text-green-800' : 
-                                                    t.type === 'allocation' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'
+                                                <span className={`badge ${
+                                                    t.type === 'deposit' ? 'badge-success' : 
+                                                    t.type === 'allocation' ? 'badge-info' : 'badge-danger'
                                                 }`}>
                                                     {t.type === 'allocation' ? 'Investment' : t.type}
                                                 </span>
                                             </td>
                                             <td className={`p-4 font-semibold ${
-                                                t.type === 'deposit' || t.type === 'allocation' ? 'text-green-600' : 'text-red-600'
+                                                t.type === 'deposit' || t.type === 'allocation' ? 'text-[#00d4aa]' : 'text-[#ff6b6b]'
                                             }`}>
-                                                {t.type === 'deposit' || t.type === 'allocation' ? '+' : '-'}${parseFloat(t.amount).toLocaleString()}
+                                                {t.type === 'deposit' || t.type === 'allocation' ? '+' : '-'}{formatCurrency(t.amount)}
                                             </td>
-                                            <td className="p-4">{t.payment_method || 'Wallet'}</td>
+                                            <td className="p-4 text-[#a0b4b8]">{t.payment_method || 'Wallet'}</td>
                                             <td className="p-4">
-                                                <span className={`px-2 py-1 rounded text-xs ${
-                                                    t.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                                    t.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
+                                                <span className={`badge ${
+                                                    t.status === 'completed' ? 'badge-success' :
+                                                    t.status === 'pending' ? 'badge-warning' : 'badge-danger'
                                                 }`}>
                                                     {t.status === 'completed' ? '✓ Completed' : t.status === 'pending' ? '⏳ Pending' : '✗ Failed'}
                                                 </span>
@@ -417,7 +424,7 @@ const Wallet = () => {
                                     ))}
                                     {transactions.length === 0 && (
                                         <tr>
-                                            <td colSpan="5" className="p-8 text-center text-gray-500">
+                                            <td colSpan="5" className="p-8 text-center text-[#a0b4b8]">
                                                 No transactions yet. Make a deposit to get started!
                                             </td>
                                         </tr>
@@ -429,38 +436,38 @@ const Wallet = () => {
 
                     {/* Withdrawal Requests */}
                     {withdrawals.length > 0 && (
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-                            <div className="p-6 border-b dark:border-gray-700">
-                                <h2 className="text-xl font-bold flex items-center">
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl overflow-hidden card-hover">
+                            <div className="p-6 border-b border-[#2a3538]">
+                                <h2 className="text-xl font-bold text-[#e8f0f0] flex items-center">
                                     <span className="mr-2">📤</span> Withdrawal History
                                 </h2>
                             </div>
                             <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-gray-50 dark:bg-gray-700">
+                                <table className="table-dark">
+                                    <thead>
                                         <tr>
-                                            <th className="p-4 text-left">Request Date</th>
-                                            <th className="p-4 text-left">Amount</th>
-                                            <th className="p-4 text-left">Method</th>
-                                            <th className="p-4 text-left">Status</th>
-                                            <th className="p-4 text-left">Processed Date</th>
+                                            <th>Request Date</th>
+                                            <th>Amount</th>
+                                            <th>Method</th>
+                                            <th>Status</th>
+                                            <th>Processed Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {withdrawals.map((w) => (
-                                            <tr key={w.id} className="border-b dark:border-gray-700">
-                                                <td className="p-4">{new Date(w.request_date).toLocaleDateString()}</td>
-                                                <td className="p-4 font-semibold">${parseFloat(w.amount).toLocaleString()}</td>
-                                                <td className="p-4">{w.payment_method || '-'}</td>
+                                            <tr key={w.id} className="hover:bg-[#1c2426] transition">
+                                                <td className="p-4 text-[#a0b4b8]">{new Date(w.request_date).toLocaleDateString()}</td>
+                                                <td className="p-4 font-semibold text-[#ff6b6b]">{formatCurrency(w.amount)}</td>
+                                                <td className="p-4 text-[#a0b4b8]">{w.payment_method || '-'}</td>
                                                 <td className="p-4">
-                                                    <span className={`px-2 py-1 rounded text-xs ${
-                                                        w.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                                        w.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
+                                                    <span className={`badge ${
+                                                        w.status === 'approved' ? 'badge-success' :
+                                                        w.status === 'pending' ? 'badge-warning' : 'badge-danger'
                                                     }`}>
                                                         {w.status}
                                                     </span>
                                                 </td>
-                                                <td className="p-4">{w.processed_date ? new Date(w.processed_date).toLocaleDateString() : '-'}</td>
+                                                <td className="p-4 text-[#a0b4b8]">{w.processed_date ? new Date(w.processed_date).toLocaleDateString() : '-'}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -471,15 +478,15 @@ const Wallet = () => {
 
                     {/* Deposit Modal */}
                     {showDepositModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                            <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto modal-dark">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-2xl font-bold">Deposit Funds</h2>
-                                    <button onClick={() => setShowDepositModal(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+                                    <h2 className="text-2xl font-bold text-[#e8f0f0]">Deposit Funds</h2>
+                                    <button onClick={() => setShowDepositModal(false)} className="text-[#a0b4b8] hover:text-[#e8f0f0] text-2xl transition">✕</button>
                                 </div>
                                 <form onSubmit={handleDeposit} className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Amount ($)</label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Amount ($)</label>
                                         <input 
                                             type="number" 
                                             value={depositAmount} 
@@ -487,19 +494,19 @@ const Wallet = () => {
                                             min="10"
                                             step="10"
                                             required
-                                            className="w-full p-3 border rounded-lg text-lg font-semibold"
+                                            className="input-dark text-lg font-semibold"
                                             placeholder="Enter amount"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Payment Method</label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Payment Method</label>
                                         <select 
                                             value={paymentMethod} 
                                             onChange={(e) => {
                                                 setPaymentMethod(e.target.value);
                                                 resetPaymentDetails();
                                             }} 
-                                            className="w-full p-3 border rounded-lg"
+                                            className="dropdown-dark"
                                         >
                                             <option value="bank_transfer">🏦 Bank Transfer</option>
                                             <option value="usdt">₿ USDT (Crypto)</option>
@@ -509,16 +516,16 @@ const Wallet = () => {
                                     
                                     {renderPaymentDetailsFields()}
                                     
-                                    <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">💡 Instructions:</p>
-                                        <p className="text-xs text-gray-500 mt-1">
+                                    <div className="p-3 bg-[#1c2426] rounded-lg border border-[#4aa0ff]/20">
+                                        <p className="text-sm text-[#a0b4b8]">💡 Instructions:</p>
+                                        <p className="text-xs text-[#6a7e82] mt-1">
                                             {paymentMethod === 'bank_transfer' && 'After submitting, please transfer the amount to our bank account. Include your email as reference.'}
                                             {paymentMethod === 'usdt' && 'After submitting, please send USDT to the provided address. Your deposit will be confirmed once received.'}
                                             {paymentMethod === 'mpesa' && 'You will receive a payment request on your M-Pesa phone number.'}
                                         </p>
                                     </div>
                                     
-                                    <button type="submit" className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+                                    <button type="submit" className="w-full btn btn-success">
                                         Submit Deposit Request
                                     </button>
                                 </form>
@@ -528,19 +535,19 @@ const Wallet = () => {
 
                     {/* Withdraw Modal */}
                     {showWithdrawModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                            <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto modal-dark">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-2xl font-bold">Withdraw Funds</h2>
-                                    <button onClick={() => setShowWithdrawModal(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+                                    <h2 className="text-2xl font-bold text-[#e8f0f0]">Withdraw Funds</h2>
+                                    <button onClick={() => setShowWithdrawModal(false)} className="text-[#a0b4b8] hover:text-[#e8f0f0] text-2xl transition">✕</button>
                                 </div>
                                 <form onSubmit={handleWithdrawRequest} className="space-y-4">
-                                    <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-center">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">Available to Withdraw</p>
-                                        <p className="text-2xl font-bold text-green-600">${balance.withdrawable.toLocaleString()}</p>
+                                    <div className="p-3 bg-[#1c2426] rounded-lg border border-[#00d4aa]/20 text-center">
+                                        <p className="text-sm text-[#a0b4b8]">Available to Withdraw</p>
+                                        <p className="text-2xl font-bold text-[#00d4aa]">{formatCurrency(balance.withdrawable)}</p>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Amount to Withdraw ($)</label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Amount to Withdraw ($)</label>
                                         <input 
                                             type="number" 
                                             value={withdrawAmount} 
@@ -549,19 +556,19 @@ const Wallet = () => {
                                             max={balance.withdrawable}
                                             step="10"
                                             required
-                                            className="w-full p-3 border rounded-lg text-lg font-semibold"
+                                            className="input-dark text-lg font-semibold"
                                             placeholder="Enter amount"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Payment Method</label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Payment Method</label>
                                         <select 
                                             value={paymentMethod} 
                                             onChange={(e) => {
                                                 setPaymentMethod(e.target.value);
                                                 resetPaymentDetails();
                                             }} 
-                                            className="w-full p-3 border rounded-lg"
+                                            className="dropdown-dark"
                                         >
                                             <option value="bank_transfer">🏦 Bank Transfer</option>
                                             <option value="usdt">₿ USDT</option>
@@ -571,14 +578,14 @@ const Wallet = () => {
                                     
                                     {renderPaymentDetailsFields()}
                                     
-                                    <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                                        <p className="text-xs text-gray-500">
+                                    <div className="p-3 bg-[#1c2426] rounded-lg border border-[#ffd93d]/20">
+                                        <p className="text-xs text-[#a0b4b8]">
                                             ⏳ Withdrawal requests are processed within 24-48 hours after admin approval.
                                             Funds will be sent to your provided payment details.
                                         </p>
                                     </div>
                                     
-                                    <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                                    <button type="submit" className="w-full btn btn-primary">
                                         Submit Withdrawal Request
                                     </button>
                                 </form>

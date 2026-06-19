@@ -118,7 +118,6 @@ const Register = () => {
             });
             
             if (response.data.success) {
-                // Store token and user data
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
                 toast.success('Email verified! Welcome to PoolTrader!');
@@ -170,10 +169,10 @@ const Register = () => {
         if (/[0-9]/.test(password)) strength++;
         if (/[^A-Za-z0-9]/.test(password)) strength++;
         
-        if (strength <= 2) return { text: 'Weak', color: 'red', width: '25%' };
-        if (strength <= 3) return { text: 'Fair', color: 'yellow', width: '50%' };
-        if (strength <= 4) return { text: 'Good', color: 'blue', width: '75%' };
-        return { text: 'Strong', color: 'green', width: '100%' };
+        if (strength <= 2) return { text: 'Weak', color: 'text-[#ff6b6b]', width: '25%' };
+        if (strength <= 3) return { text: 'Fair', color: 'text-[#ffd93d]', width: '50%' };
+        if (strength <= 4) return { text: 'Good', color: 'text-[#4aa0ff]', width: '75%' };
+        return { text: 'Strong', color: 'text-[#00d4aa]', width: '100%' };
     };
 
     if (showVerification) {
@@ -181,26 +180,25 @@ const Register = () => {
             <>
                 <SEO title="Verify Email - PoolTrader" description="Verify your email address" />
                 
-                <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
-                    <div className="absolute inset-0 bg-black opacity-50"></div>
+                <div className="min-h-screen bg-[#0a0e0f] flex items-center justify-center py-12 px-4">
                     <div className="relative z-10 max-w-md w-full">
                         <div className="text-center mb-8">
                             <div className="flex justify-center mb-4">
-                                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                                <div className="w-20 h-20 bg-gradient-to-r from-[#00d4aa] to-[#00b894] rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(0,212,170,0.2)]">
                                     <span className="text-4xl">📧</span>
                                 </div>
                             </div>
-                            <h2 className="text-3xl font-bold text-white">Verify Your Email</h2>
-                            <p className="text-gray-300 mt-2">
+                            <h2 className="text-3xl font-bold text-[#e8f0f0]">Verify Your Email</h2>
+                            <p className="text-[#a0b4b8] mt-2">
                                 We've sent a verification code to<br />
-                                <strong className="text-blue-400">{registeredEmail}</strong>
+                                <strong className="text-[#00d4aa]">{registeredEmail}</strong>
                             </p>
                         </div>
                         
-                        <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-gray-700">
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-8 card-hover">
                             <div className="space-y-6">
                                 <div>
-                                    <label className="text-gray-300 text-sm font-semibold block mb-2">
+                                    <label className="text-[#a0b4b8] text-sm font-semibold block mb-2">
                                         Enter Verification Code
                                     </label>
                                     <input
@@ -209,9 +207,9 @@ const Register = () => {
                                         onChange={(e) => setVerificationCode(e.target.value)}
                                         placeholder="Enter 6-digit code"
                                         maxLength="6"
-                                        className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl tracking-widest"
+                                        className="input-dark text-center text-2xl tracking-widest"
                                     />
-                                    <p className="text-gray-400 text-sm mt-2 text-center">
+                                    <p className="text-[#6a7e82] text-sm mt-2 text-center">
                                         Check your spam folder if you don't see the email
                                     </p>
                                 </div>
@@ -219,7 +217,7 @@ const Register = () => {
                                 <button
                                     onClick={handleVerifyEmail}
                                     disabled={isLoading}
-                                    className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
+                                    className="w-full btn btn-primary btn-lg"
                                 >
                                     {isLoading ? 'Verifying...' : 'Verify Email'}
                                 </button>
@@ -228,7 +226,7 @@ const Register = () => {
                                     <button
                                         onClick={handleResendCode}
                                         disabled={resendTimer > 0}
-                                        className="text-blue-400 hover:text-blue-300 text-sm disabled:opacity-50"
+                                        className="text-[#00d4aa] hover:text-[#33ddbb] text-sm font-medium transition disabled:opacity-50"
                                     >
                                         {resendTimer > 0 
                                             ? `Resend code in ${resendTimer}s` 
@@ -237,7 +235,7 @@ const Register = () => {
                                 </div>
                                 
                                 <div className="text-center">
-                                    <Link to="/login" className="text-gray-400 hover:text-gray-300 text-sm">
+                                    <Link to="/login" className="text-[#6a7e82] hover:text-[#a0b4b8] text-sm transition">
                                         ← Back to Login
                                     </Link>
                                 </div>
@@ -253,129 +251,123 @@ const Register = () => {
         <>
             <SEO title="Register - PoolTrader" description="Create a new trading pool account" />
             
-            <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
-                <div className="absolute inset-0 bg-black opacity-50"></div>
+            <div className="min-h-screen bg-[#0a0e0f] flex items-center justify-center py-12 px-4">
                 <div className="relative z-10 max-w-md w-full">
+                    {/* Header */}
                     <div className="text-center mb-8">
                         <div className="flex justify-center mb-4">
-                            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            <div className="w-20 h-20 bg-gradient-to-r from-[#00d4aa] to-[#00b894] rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(0,212,170,0.2)]">
+                                <svg className="w-12 h-12 text-[#0a0e0f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                 </svg>
                             </div>
                         </div>
-                        <h2 className="text-3xl font-bold text-white">Create Account</h2>
-                        <p className="text-gray-300 mt-2">Start your trading journey today</p>
+                        <h2 className="text-3xl font-bold text-[#e8f0f0]">Create Account</h2>
+                        <p className="text-[#a0b4b8] mt-2">Start your trading journey today</p>
                     </div>
                     
-                    <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-gray-700">
+                    {/* Registration Form */}
+                    <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-8 card-hover">
                         <form className="space-y-5" onSubmit={handleSubmit}>
                             {/* Full Name Field */}
                             <div>
-                                <label className="text-gray-300 text-sm font-semibold block mb-2">
+                                <label className="text-[#a0b4b8] text-sm font-semibold block mb-2">
                                     Full Name
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">👤</span>
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6a7e82]">👤</span>
                                     <input
                                         name="fullName"
                                         type="text"
                                         value={formData.fullName}
                                         onChange={handleChange}
-                                        className={`w-full pl-10 pr-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
-                                            errors.fullName ? 'border-red-500' : 'border-gray-600'
-                                        }`}
+                                        className={`input-dark pl-10 ${errors.fullName ? 'border-[#ff6b6b]' : ''}`}
                                         placeholder="John Doe"
                                     />
                                 </div>
-                                {errors.fullName && <p className="text-red-400 text-xs mt-1">{errors.fullName}</p>}
+                                {errors.fullName && <p className="text-[#ff6b6b] text-xs mt-1">{errors.fullName}</p>}
                             </div>
 
                             {/* Email Field */}
                             <div>
-                                <label className="text-gray-300 text-sm font-semibold block mb-2">
+                                <label className="text-[#a0b4b8] text-sm font-semibold block mb-2">
                                     Email Address
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">📧</span>
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6a7e82]">📧</span>
                                     <input
                                         name="email"
                                         type="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        className={`w-full pl-10 pr-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
-                                            errors.email ? 'border-red-500' : 'border-gray-600'
-                                        }`}
+                                        className={`input-dark pl-10 ${errors.email ? 'border-[#ff6b6b]' : ''}`}
                                         placeholder="you@example.com"
                                     />
                                 </div>
-                                {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+                                {errors.email && <p className="text-[#ff6b6b] text-xs mt-1">{errors.email}</p>}
                             </div>
 
                             {/* Password Field */}
                             <div>
-                                <label className="text-gray-300 text-sm font-semibold block mb-2">
+                                <label className="text-[#a0b4b8] text-sm font-semibold block mb-2">
                                     Password
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔒</span>
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6a7e82]">🔒</span>
                                     <input
                                         name="password"
                                         type={showPassword ? "text" : "password"}
                                         value={formData.password}
                                         onChange={handleChange}
-                                        className={`w-full pl-10 pr-12 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
-                                            errors.password ? 'border-red-500' : 'border-gray-600'
-                                        }`}
+                                        className={`input-dark pl-10 pr-12 ${errors.password ? 'border-[#ff6b6b]' : ''}`}
                                         placeholder="Create a password"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6a7e82] hover:text-[#a0b4b8] transition"
                                     >
-                                        {showPassword ? '👁️' : '👁️‍🗨️'}
+                                        {showPassword ? '🙈' : '👁️'}
                                     </button>
                                 </div>
                                 
                                 {formData.password && (
                                     <div className="mt-2">
                                         <div className="flex justify-between text-xs mb-1">
-                                            <span className="text-gray-400">Password strength:</span>
-                                            <span className={`text-${passwordStrength().color}-400`}>
+                                            <span className="text-[#6a7e82]">Password strength:</span>
+                                            <span className={passwordStrength().color}>
                                                 {passwordStrength().text}
                                             </span>
                                         </div>
-                                        <div className="w-full bg-gray-700 rounded-full h-1">
-                                            <div className={`h-1 rounded-full transition-all duration-300 bg-${passwordStrength().color}-500`} style={{ width: passwordStrength().width }}></div>
+                                        <div className="w-full bg-[#1c2426] rounded-full h-1.5">
+                                            <div className={`h-1.5 rounded-full transition-all duration-300 bg-[#00d4aa]`} 
+                                                 style={{ width: passwordStrength().width }}></div>
                                         </div>
                                     </div>
                                 )}
-                                {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
-                                <p className="text-gray-500 text-xs mt-1">
+                                {errors.password && <p className="text-[#ff6b6b] text-xs mt-1">{errors.password}</p>}
+                                <p className="text-[#6a7e82] text-xs mt-1">
                                     Must contain at least 6 characters, uppercase, lowercase, and number
                                 </p>
                             </div>
 
                             {/* Confirm Password Field */}
                             <div>
-                                <label className="text-gray-300 text-sm font-semibold block mb-2">
+                                <label className="text-[#a0b4b8] text-sm font-semibold block mb-2">
                                     Confirm Password
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔒</span>
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6a7e82]">🔒</span>
                                     <input
                                         name="confirmPassword"
                                         type={showPassword ? "text" : "password"}
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
-                                        className={`w-full pl-10 pr-4 py-3 bg-white/10 border rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
-                                            errors.confirmPassword ? 'border-red-500' : 'border-gray-600'
-                                        }`}
+                                        className={`input-dark pl-10 ${errors.confirmPassword ? 'border-[#ff6b6b]' : ''}`}
                                         placeholder="Confirm your password"
                                     />
                                 </div>
-                                {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
+                                {errors.confirmPassword && <p className="text-[#ff6b6b] text-xs mt-1">{errors.confirmPassword}</p>}
                             </div>
 
                             {/* Terms and Conditions */}
@@ -385,30 +377,30 @@ const Register = () => {
                                     id="terms"
                                     checked={agreeTerms}
                                     onChange={(e) => setAgreeTerms(e.target.checked)}
-                                    className="mt-1 mr-3 w-4 h-4 rounded border-gray-600 bg-white/10 text-blue-600 focus:ring-blue-500"
+                                    className="mt-1 mr-3 w-4 h-4 rounded border-[#2a3538] bg-[#1c2426] accent-[#00d4aa] focus:ring-[#00d4aa]"
                                 />
-                                <label htmlFor="terms" className="text-gray-300 text-sm">
+                                <label htmlFor="terms" className="text-[#a0b4b8] text-sm">
                                     I agree to the{' '}
-                                    <Link to="/terms" className="text-blue-400 hover:text-blue-300">
+                                    <Link to="/terms" className="text-[#00d4aa] hover:text-[#33ddbb] transition font-medium">
                                         Terms of Service
                                     </Link>{' '}
                                     and{' '}
-                                    <Link to="/privacy" className="text-blue-400 hover:text-blue-300">
+                                    <Link to="/privacy" className="text-[#00d4aa] hover:text-[#33ddbb] transition font-medium">
                                         Privacy Policy
                                     </Link>
                                 </label>
                             </div>
-                            {errors.terms && <p className="text-red-400 text-xs">{errors.terms}</p>}
+                            {errors.terms && <p className="text-[#ff6b6b] text-xs">{errors.terms}</p>}
 
                             {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition transform hover:scale-[1.02] disabled:opacity-50"
+                                className="w-full btn btn-primary btn-lg"
                             >
                                 {isLoading ? (
                                     <span className="flex items-center justify-center">
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#0a0e0f]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
@@ -419,14 +411,21 @@ const Register = () => {
 
                             {/* Login Link */}
                             <div className="text-center pt-4">
-                                <p className="text-gray-400">
+                                <p className="text-[#a0b4b8]">
                                     Already have an account?{' '}
-                                    <Link to="/login" className="text-blue-400 hover:text-blue-300 font-semibold">
+                                    <Link to="/login" className="text-[#00d4aa] hover:text-[#33ddbb] font-semibold transition">
                                         Sign in
                                     </Link>
                                 </p>
                             </div>
                         </form>
+                    </div>
+
+                    {/* Risk Warning */}
+                    <div className="mt-4 p-3 border-l-4 border-[#ff6b6b] bg-[#161c1e] rounded-lg">
+                        <p className="text-xs text-[#6a7e82]">
+                            ⚠️ <strong className="text-[#ff6b6b]">Risk Warning:</strong> Trading involves substantial risk of loss. Past performance does not guarantee future results.
+                        </p>
                     </div>
                 </div>
             </div>

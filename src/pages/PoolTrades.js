@@ -94,25 +94,25 @@ const SearchableDropdown = ({ options, value, onChange, placeholder = 'Search cu
   return (
     <div className="relative" ref={dropdownRef}>
       <div 
-        className="w-full p-2 border rounded-lg dark:bg-gray-700 cursor-pointer hover:border-blue-500 transition"
+        className="w-full p-2 border border-[#2a3538] rounded-lg bg-[#1c2426] cursor-pointer hover:border-[#00d4aa] transition"
         onClick={() => setIsOpen(!isOpen)}
       >
         {selectedOption ? (
           <div className="flex justify-between items-center">
-            <span className="font-medium">{selectedOption.symbol}</span>
-            <span className="text-sm text-gray-500">{selectedOption.name}</span>
+            <span className="font-medium text-[#e8f0f0]">{selectedOption.symbol}</span>
+            <span className="text-sm text-[#6a7e82]">{selectedOption.name}</span>
           </div>
         ) : (
-          <span className="text-gray-400">{placeholder}</span>
+          <span className="text-[#6a7e82]">{placeholder}</span>
         )}
       </div>
       
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border rounded-lg shadow-lg max-h-80 overflow-hidden">
-          <div className="p-2 border-b dark:border-gray-700">
+        <div className="absolute z-50 w-full mt-1 bg-[#161c1e] border border-[#2a3538] rounded-lg shadow-lg max-h-80 overflow-hidden">
+          <div className="p-2 border-b border-[#2a3538]">
             <input
               type="text"
-              className="w-full p-2 border rounded-lg dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border border-[#2a3538] rounded-lg bg-[#1c2426] text-[#e8f0f0] focus:outline-none focus:ring-2 focus:ring-[#00d4aa] focus:border-transparent"
               placeholder="Type to search pairs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -126,18 +126,18 @@ const SearchableDropdown = ({ options, value, onChange, placeholder = 'Search cu
               filteredOptions.map((option, index) => (
                 <div
                   key={index}
-                  className="p-2 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer flex justify-between items-center"
+                  className="p-2 hover:bg-[#1c2426] cursor-pointer flex justify-between items-center"
                   onClick={() => handleSelect(option)}
                 >
                   <div>
-                    <span className="font-medium">{option.symbol}</span>
-                    <span className="text-xs text-gray-500 ml-2">{option.group}</span>
+                    <span className="font-medium text-[#e8f0f0]">{option.symbol}</span>
+                    <span className="text-xs text-[#6a7e82] ml-2">{option.group}</span>
                   </div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{option.name}</span>
+                  <span className="text-sm text-[#a0b4b8]">{option.name}</span>
                 </div>
               ))
             ) : (
-              <div className="p-4 text-center text-gray-500">
+              <div className="p-4 text-center text-[#6a7e82]">
                 No pairs found. You can type a custom pair.
               </div>
             )}
@@ -165,41 +165,57 @@ const DateTimePicker = ({ value, onChange, label }) => {
 
   return (
     <div className="space-y-1">
-      {label && <label className="block text-sm font-medium mb-1">{label}</label>}
+      {label && <label className="block text-sm font-medium text-[#a0b4b8] mb-1">{label}</label>}
       {isEditing ? (
         <div className="flex gap-2">
           <input
             type="datetime-local"
-            className="w-full p-2 border rounded-lg dark:bg-gray-700"
+            className="w-full p-2 border border-[#2a3538] rounded-lg bg-[#1c2426] text-[#e8f0f0] focus:outline-none focus:ring-2 focus:ring-[#00d4aa]"
             value={tempValue}
             onChange={(e) => setTempValue(e.target.value)}
           />
           <button
             type="button"
             onClick={handleSave}
-            className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            className="px-3 py-2 bg-[#00d4aa] text-[#0a0e0f] rounded-lg hover:bg-[#00b894] transition font-semibold"
           >
             ✓
           </button>
           <button
             type="button"
             onClick={handleCancel}
-            className="px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+            className="px-3 py-2 bg-[#2a3538] text-[#a0b4b8] rounded-lg hover:bg-[#3a4a4e] transition"
           >
             ✕
           </button>
         </div>
       ) : (
         <div 
-          className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 flex justify-between items-center"
+          className="w-full p-2 bg-[#1c2426] border border-[#2a3538] rounded-lg cursor-pointer hover:border-[#00d4aa] transition flex justify-between items-center"
           onClick={() => setIsEditing(true)}
         >
-          <span>{value ? new Date(value).toLocaleString() : 'Click to set time'}</span>
-          <span className="text-xs text-gray-500">✎ Edit</span>
+          <span className="text-[#e8f0f0]">{value ? new Date(value).toLocaleString() : 'Click to set time'}</span>
+          <span className="text-xs text-[#6a7e82]">✎ Edit</span>
         </div>
       )}
     </div>
   );
+};
+
+// Helper function to format currency
+const formatCurrency = (value) => {
+  if (value === null || value === undefined || value === '') return '-';
+  const num = parseFloat(value);
+  if (isNaN(num)) return '-';
+  return `$${num.toFixed(2)}`;
+};
+
+// Helper function to format number with decimals
+const formatNumber = (value, decimals = 4) => {
+  if (value === null || value === undefined || value === '') return '-';
+  const num = parseFloat(value);
+  if (isNaN(num)) return '-';
+  return num.toFixed(decimals);
 };
 
 // Main PoolTrades Component
@@ -225,25 +241,38 @@ const PoolTrades = () => {
     const [showAddTradeModal, setShowAddTradeModal] = useState(false);
     const [showCloseTradeModal, setShowCloseTradeModal] = useState(false);
     const [closingTrade, setClosingTrade] = useState(null);
+    
+    // Auto-calculated P/L for close modal
+    const [calculatedPL, setCalculatedPL] = useState(0);
+    
     const [formData, setFormData] = useState({
         symbol: '',
         direction: 'BUY',
-        volume: '',
+        lot_size: '',
         open_price: '',
         stop_loss: '',
         take_profit: '',
-        entry_amount: '',
+        stake: '',
         notes: '',
         open_time: new Date().toISOString().slice(0, 16)
     });
 
     const [closeFormData, setCloseFormData] = useState({
         close_price: '',
-        exit_amount: '',
-        profit_loss: '',
+        return_amount: '',
         closed_reason: '',
         close_time: new Date().toISOString().slice(0, 16)
     });
+
+    // Auto-calculate P/L when return_amount changes
+    useEffect(() => {
+        if (closingTrade) {
+            const stake = parseFloat(closingTrade.stake || closingTrade.entry_amount || 0);
+            const returnAmount = parseFloat(closeFormData.return_amount) || 0;
+            const pl = returnAmount - stake;
+            setCalculatedPL(pl);
+        }
+    }, [closeFormData.return_amount, closingTrade]);
 
     // Get selected pair details
     const selectedPair = popularCurrencyPairs.find(p => p.symbol === formData.symbol);
@@ -291,13 +320,6 @@ const PoolTrades = () => {
         return { valid: true, message: '' };
     };
 
-    // Format number with correct decimals
-    const formatPrice = (value, pair) => {
-        if (!pair) return value;
-        const decimals = pair.priceDecimals || 4;
-        return parseFloat(value).toFixed(decimals);
-    };
-
     // Get volume step based on pair type
     const getVolumeStep = (pair) => {
         if (!pair) return '0.01';
@@ -306,7 +328,7 @@ const PoolTrades = () => {
 
     // Get volume placeholder based on pair type
     const getVolumePlaceholder = (pair) => {
-        if (!pair) return 'Enter volume';
+        if (!pair) return 'Enter lot size';
         return `e.g., ${pair.volumeMin} - ${pair.volumeMax} ${pair.volumeLabel}`;
     };
 
@@ -324,14 +346,26 @@ const PoolTrades = () => {
 
     // Get volume label
     const getVolumeLabel = (pair) => {
-        if (!pair) return 'Volume';
-        return `Volume (${pair.volumeLabel})`;
+        if (!pair) return 'Lot Size';
+        return `Lot Size (${pair.volumeLabel})`;
     };
 
     // Get price label
     const getPriceLabel = (pair) => {
         if (!pair) return 'Price';
         return `Price (${pair.symbol})`;
+    };
+
+    // Get asset type badge
+    const getAssetTypeBadge = (pair) => {
+        if (!pair) return null;
+        const types = {
+            'forex': { color: 'bg-[#1c2426] text-[#00d4aa] border border-[#00d4aa]/30', label: '💱 Forex' },
+            'crypto': { color: 'bg-[#1c2426] text-[#a855f7] border border-[#a855f7]/30', label: '₿ Crypto' },
+            'gold': { color: 'bg-[#1c2426] text-[#ffd93d] border border-[#ffd93d]/30', label: '🥇 Gold' },
+            'commodity': { color: 'bg-[#1c2426] text-[#4aa0ff] border border-[#4aa0ff]/30', label: '🛢️ Commodity' }
+        };
+        return types[pair.type] || types.forex;
     };
 
     const fetchPoolTrades = useCallback(async () => {
@@ -399,13 +433,15 @@ const PoolTrades = () => {
         
         try {
             const response = await api.post('/admin/trade-management/trade', {
-                ...formData,
-                pool_id: parseInt(finalPoolId),
-                volume: parseFloat(formData.volume),
-                open_price: parseFloat(formData.open_price),
+                symbol: formData.symbol,
+                direction: formData.direction,
+                lot_size: parseFloat(formData.lot_size) || 0,
+                open_price: parseFloat(formData.open_price) || 0,
+                stake: parseFloat(formData.stake) || 0,
                 stop_loss: formData.stop_loss ? parseFloat(formData.stop_loss) : null,
                 take_profit: formData.take_profit ? parseFloat(formData.take_profit) : null,
-                entry_amount: formData.entry_amount ? parseFloat(formData.entry_amount) : null,
+                pool_id: parseInt(finalPoolId),
+                notes: formData.notes || '',
                 open_time: formData.open_time ? new Date(formData.open_time).toISOString() : new Date().toISOString()
             });
             
@@ -416,11 +452,11 @@ const PoolTrades = () => {
                 setFormData({
                     symbol: '',
                     direction: 'BUY',
-                    volume: '',
+                    lot_size: '',
                     open_price: '',
                     stop_loss: '',
                     take_profit: '',
-                    entry_amount: '',
+                    stake: '',
                     notes: '',
                     open_time: new Date().toISOString().slice(0, 16)
                 });
@@ -434,21 +470,26 @@ const PoolTrades = () => {
         setClosingTrade(trade);
         setCloseFormData({
             close_price: '',
-            exit_amount: '',
-            profit_loss: '',
+            return_amount: '',
             closed_reason: '',
             close_time: new Date().toISOString().slice(0, 16)
         });
+        setCalculatedPL(0);
         setShowCloseTradeModal(true);
     };
 
     const confirmCloseTrade = async (e) => {
         e.preventDefault();
+        
+        const stake = parseFloat(closingTrade.stake || closingTrade.entry_amount || 0);
+        const returnAmount = parseFloat(closeFormData.return_amount) || 0;
+        const pl = returnAmount - stake;
+        
         try {
             const response = await api.post(`/admin/trade-management/trade/${closingTrade.id}/close`, {
-                close_price: parseFloat(closeFormData.close_price),
-                exit_amount: closeFormData.exit_amount ? parseFloat(closeFormData.exit_amount) : null,
-                profit_loss: closeFormData.profit_loss ? parseFloat(closeFormData.profit_loss) : null,
+                close_price: parseFloat(closeFormData.close_price) || 0,
+                return_amount: returnAmount,
+                profit_loss: pl,
                 closed_reason: closeFormData.closed_reason || 'Closed by admin',
                 close_time: closeFormData.close_time ? new Date(closeFormData.close_time).toISOString() : new Date().toISOString()
             });
@@ -459,11 +500,11 @@ const PoolTrades = () => {
                 setClosingTrade(null);
                 setCloseFormData({
                     close_price: '',
-                    exit_amount: '',
-                    profit_loss: '',
+                    return_amount: '',
                     closed_reason: '',
                     close_time: new Date().toISOString().slice(0, 16)
                 });
+                setCalculatedPL(0);
                 fetchPoolTrades();
             }
         } catch (error) {
@@ -482,14 +523,14 @@ const PoolTrades = () => {
 
     if (!finalPoolId) {
         return (
-            <div className="flex justify-center items-center h-screen">
+            <div className="flex justify-center items-center h-screen bg-[#0a0e0f]">
                 <div className="text-center">
                     <div className="text-6xl mb-4">⚠️</div>
-                    <h2 className="text-2xl font-bold text-red-600 mb-2">Invalid Pool ID</h2>
-                    <p className="text-gray-600">No pool ID provided in the URL.</p>
+                    <h2 className="text-2xl font-bold text-[#ff6b6b] mb-2">Invalid Pool ID</h2>
+                    <p className="text-[#a0b4b8]">No pool ID provided in the URL.</p>
                     <button 
                         onClick={() => navigate('/admin')}
-                        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        className="btn btn-primary mt-4"
                     >
                         Back to Admin
                     </button>
@@ -500,10 +541,10 @@ const PoolTrades = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen">
+            <div className="flex justify-center items-center h-screen bg-[#0a0e0f]">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-gray-500">Loading trades for Pool #{finalPoolId}...</p>
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#00d4aa] mx-auto mb-4"></div>
+                    <p className="text-[#a0b4b8]">Loading trades for Pool #{finalPoolId}...</p>
                 </div>
             </div>
         );
@@ -511,14 +552,14 @@ const PoolTrades = () => {
 
     if (error) {
         return (
-            <div className="flex justify-center items-center h-screen">
+            <div className="flex justify-center items-center h-screen bg-[#0a0e0f]">
                 <div className="text-center">
                     <div className="text-6xl mb-4">⚠️</div>
-                    <h2 className="text-2xl font-bold text-red-600 mb-2">Error Loading Data</h2>
-                    <p className="text-gray-600 mb-4">{error}</p>
+                    <h2 className="text-2xl font-bold text-[#ff6b6b] mb-2">Error Loading Data</h2>
+                    <p className="text-[#a0b4b8] mb-4">{error}</p>
                     <button 
                         onClick={() => navigate('/admin')}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                        className="btn btn-primary"
                     >
                         Back to Admin Panel
                     </button>
@@ -531,55 +572,43 @@ const PoolTrades = () => {
         return new Date().toLocaleString();
     };
 
-    // Get asset type badge
-    const getAssetTypeBadge = (pair) => {
-        if (!pair) return null;
-        const types = {
-            'forex': { color: 'bg-blue-100 text-blue-800', label: '💱 Forex' },
-            'crypto': { color: 'bg-purple-100 text-purple-800', label: '₿ Crypto' },
-            'gold': { color: 'bg-yellow-100 text-yellow-800', label: '🥇 Gold' },
-            'commodity': { color: 'bg-green-100 text-green-800', label: '🛢️ Commodity' }
-        };
-        return types[pair.type] || types.forex;
-    };
-
     return (
         <>
             <SEO title={`${pool?.name || 'Pool'} - Trade Management`} />
             
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="min-h-screen bg-[#0a0e0f]">
                 <div className="container mx-auto px-4 py-8">
                     {/* Header */}
                     <div className="mb-8">
                         <button 
                             onClick={() => navigate('/admin')} 
-                            className="text-blue-600 hover:text-blue-700 mb-2 inline-block flex items-center gap-2"
+                            className="text-[#00d4aa] hover:text-[#33ddbb] mb-2 inline-block flex items-center gap-2 font-medium transition"
                         >
                             ← Back to Admin Panel
                         </button>
-                        <h1 className="text-3xl font-bold">{pool?.name || 'Pool'} - Trade Management</h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-2">
+                        <h1 className="text-3xl font-bold text-[#e8f0f0]">{pool?.name || 'Pool'} - Trade Management</h1>
+                        <p className="text-[#a0b4b8] mt-2">
                             Pool ID: {finalPoolId} • Current Time: {getCurrentDateTime()}
                         </p>
                     </div>
 
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
-                            <p className="text-gray-500 text-sm">Total Trades</p>
-                            <p className="text-2xl font-bold">{tradeStats.total_trades || 0}</p>
+                        <div className="stat-card">
+                            <div className="stat-label">Total Trades</div>
+                            <div className="stat-value">{tradeStats.total_trades || 0}</div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
-                            <p className="text-gray-500 text-sm">Open Positions</p>
-                            <p className="text-2xl font-bold text-yellow-600">{tradeStats.open_trades || 0}</p>
+                        <div className="stat-card">
+                            <div className="stat-label">Open Positions</div>
+                            <div className="stat-value text-[#ffd93d]">{tradeStats.open_trades || 0}</div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
-                            <p className="text-gray-500 text-sm">Total Profit</p>
-                            <p className="text-2xl font-bold text-green-600">${Math.abs(tradeStats.total_profit || 0).toLocaleString()}</p>
+                        <div className="stat-card">
+                            <div className="stat-label">Total Profit</div>
+                            <div className="stat-value text-[#00d4aa]">${Math.abs(tradeStats.total_profit || 0).toLocaleString()}</div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
-                            <p className="text-gray-500 text-sm">Total Loss</p>
-                            <p className="text-2xl font-bold text-red-600">-${Math.abs(tradeStats.total_loss || 0).toLocaleString()}</p>
+                        <div className="stat-card">
+                            <div className="stat-label">Total Loss</div>
+                            <div className="stat-value text-[#ff6b6b]">-${Math.abs(tradeStats.total_loss || 0).toLocaleString()}</div>
                         </div>
                     </div>
 
@@ -587,7 +616,7 @@ const PoolTrades = () => {
                     <div className="mb-6">
                         <button 
                             onClick={() => setShowAddTradeModal(true)}
-                            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg"
+                            className="btn btn-primary btn-lg"
                         >
                             + Open New Trade
                         </button>
@@ -596,59 +625,60 @@ const PoolTrades = () => {
                     {/* Open Positions Section */}
                     {openPositions.length > 0 && (
                         <div className="mb-8">
-                            <h2 className="text-2xl font-bold mb-4">📈 Open Positions ({openPositions.length})</h2>
-                            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                            <h2 className="text-2xl font-bold text-[#e8f0f0] mb-4">📈 Open Positions ({openPositions.length})</h2>
+                            <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl overflow-hidden card-hover">
                                 <div className="overflow-x-auto">
-                                    <table className="w-full min-w-[1100px]">
-                                        <thead className="bg-gray-50 dark:bg-gray-700">
+                                    <table className="table-dark">
+                                        <thead>
                                             <tr>
-                                                <th className="p-4 text-left">Open Time</th>
-                                                <th className="p-4 text-left">Symbol</th>
-                                                <th className="p-4 text-left">Type</th>
-                                                <th className="p-4 text-left">Direction</th>
-                                                <th className="p-4 text-left">Lot Size</th>
-                                                <th className="p-4 text-left">Entry Price</th>
-                                                <th className="p-4 text-left">Entry Amount</th>
-                                                <th className="p-4 text-left">Stop Loss</th>
-                                                <th className="p-4 text-left">Take Profit</th>
-                                                <th className="p-4 text-left">Current P&L</th>
-                                                <th className="p-4 text-left">Actions</th>
+                                                <th>Open Time</th>
+                                                <th>Pool</th>
+                                                <th>Symbol</th>
+                                                <th>Type</th>
+                                                <th>Direction</th>
+                                                <th>Lot Size</th>
+                                                <th>Entry Price</th>
+                                                <th>Stake ($)</th>
+                                                <th>Stop Loss</th>
+                                                <th>Take Profit</th>
+                                                <th>Current P&L</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {openPositions.map(trade => {
                                                 const pair = popularCurrencyPairs.find(p => p.symbol === trade.symbol);
+                                                const typeBadge = getAssetTypeBadge(pair);
                                                 return (
-                                                    <tr key={trade.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                                                        <td className="p-4 text-sm">{new Date(trade.open_time).toLocaleString()}</td>
-                                                        <td className="p-4 font-semibold">{trade.symbol}</td>
+                                                    <tr key={trade.id} className="hover:bg-[#1c2426] transition">
+                                                        <td className="p-4 text-sm text-[#a0b4b8]">{new Date(trade.open_time).toLocaleString()}</td>
+                                                        <td className="p-4 font-medium text-[#e8f0f0]">{trade.pool_name || pool?.name || '-'}</td>
+                                                        <td className="p-4 font-semibold text-[#e8f0f0]">{trade.symbol}</td>
                                                         <td className="p-4">
                                                             {pair && (
-                                                                <span className={`px-2 py-1 rounded text-xs font-semibold ${getAssetTypeBadge(pair).color}`}>
-                                                                    {getAssetTypeBadge(pair).label}
+                                                                <span className={`px-2 py-1 rounded text-xs font-semibold ${typeBadge.color}`}>
+                                                                    {typeBadge.label}
                                                                 </span>
                                                             )}
                                                         </td>
                                                         <td className="p-4">
-                                                            <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                                                trade.direction === 'BUY' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                                            }`}>
+                                                            <span className={`badge ${trade.direction === 'BUY' ? 'badge-success' : 'badge-danger'}`}>
                                                                 {trade.direction}
                                                             </span>
                                                         </td>
-                                                        <td className="p-4">{trade.volume} {pair?.volumeLabel || ''}</td>
-                                                        <td className="p-4">{parseFloat(trade.open_price).toFixed(pair?.priceDecimals || 4)}</td>
-                                                        <td className="p-4 font-semibold">${trade.entry_amount ? parseFloat(trade.entry_amount).toFixed(2) : '-'}</td>
-                                                        <td className="p-4 text-red-600">{trade.stop_loss ? `$${parseFloat(trade.stop_loss).toFixed(pair?.priceDecimals || 4)}` : '-'}</td>
-                                                        <td className="p-4 text-green-600">{trade.take_profit ? `$${parseFloat(trade.take_profit).toFixed(pair?.priceDecimals || 4)}` : '-'}</td>
-                                                        <td className={`p-4 font-semibold ${(trade.current_pnl || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                        <td className="p-4 text-[#e8f0f0]">{trade.lot_size || trade.volume || '-'}</td>
+                                                        <td className="p-4 text-[#e8f0f0]">{formatNumber(trade.open_price, pair?.priceDecimals || 4)}</td>
+                                                        <td className="p-4 font-semibold text-[#e8f0f0]">{formatCurrency(trade.stake || trade.entry_amount)}</td>
+                                                        <td className="p-4 text-[#ff6b6b]">{trade.stop_loss ? `$${formatNumber(trade.stop_loss, pair?.priceDecimals || 4)}` : '-'}</td>
+                                                        <td className="p-4 text-[#00d4aa]">{trade.take_profit ? `$${formatNumber(trade.take_profit, pair?.priceDecimals || 4)}` : '-'}</td>
+                                                        <td className={`p-4 font-semibold ${(trade.current_pnl || 0) >= 0 ? 'text-[#00d4aa]' : 'text-[#ff6b6b]'}`}>
                                                             ${(trade.current_pnl || 0).toLocaleString()}
-                                                            <span className="text-xs block">{(trade.pnl_percentage || 0).toFixed(2)}%</span>
+                                                            <span className="text-xs block text-[#6a7e82]">{(trade.pnl_percentage || 0).toFixed(2)}%</span>
                                                         </td>
                                                         <td className="p-4">
                                                             <button 
                                                                 onClick={() => handleCloseTrade(trade)} 
-                                                                className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                                                                className="btn btn-danger btn-sm"
                                                             >
                                                                 Close
                                                             </button>
@@ -665,71 +695,73 @@ const PoolTrades = () => {
 
                     {/* Trade History */}
                     <div>
-                        <h2 className="text-2xl font-bold mb-4">📋 Trade History ({trades.length})</h2>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                        <h2 className="text-2xl font-bold text-[#e8f0f0] mb-4">📋 Trade History ({trades.length})</h2>
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl overflow-hidden card-hover">
                             <div className="overflow-x-auto">
-                                <table className="w-full min-w-[1300px]">
-                                    <thead className="bg-gray-50 dark:bg-gray-700">
+                                <table className="table-dark">
+                                    <thead>
                                         <tr>
-                                            <th className="p-4 text-left">Open Time</th>
-                                            <th className="p-4 text-left">Close Time</th>
-                                            <th className="p-4 text-left">Symbol</th>
-                                            <th className="p-4 text-left">Type</th>
-                                            <th className="p-4 text-left">Direction</th>
-                                            <th className="p-4 text-left">Entry Volume</th>
-                                            <th className="p-4 text-left">Exit volume</th>
-                                            <th className="p-4 text-left">Lot Size</th>
-                                            <th className="p-4 text-left">Entry $</th>
-                                            <th className="p-4 text-left">Exit $</th>
-                                            <th className="p-4 text-left">P&L</th>
-                                            <th className="p-4 text-left">Status</th>
-                                            <th className="p-4 text-left">Reason</th>
+                                            <th>Open Time</th>
+                                            <th>Close Time</th>
+                                            <th>Pool</th>
+                                            <th>Symbol</th>
+                                            <th>Type</th>
+                                            <th>Direction</th>
+                                            <th>Lot Size</th>
+                                            <th>Entry</th>
+                                            <th>Exit</th>
+                                            <th>Stake $</th>
+                                            <th>Return $</th>
+                                            <th>P&L</th>
+                                            <th>Status</th>
+                                            <th>Reason</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {trades.map(trade => {
                                             const pair = popularCurrencyPairs.find(p => p.symbol === trade.symbol);
+                                            const typeBadge = getAssetTypeBadge(pair);
                                             return (
-                                                <tr key={trade.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                                                    <td className="p-4 text-sm">{new Date(trade.open_time).toLocaleString()}</td>
-                                                    <td className="p-4 text-sm">{trade.close_time ? new Date(trade.close_time).toLocaleString() : '-'}</td>
-                                                    <td className="p-4 font-semibold">{trade.symbol}</td>
+                                                <tr key={trade.id} className="hover:bg-[#1c2426] transition">
+                                                    <td className="p-4 text-sm text-[#a0b4b8]">{new Date(trade.open_time).toLocaleString()}</td>
+                                                    <td className="p-4 text-sm text-[#a0b4b8]">{trade.close_time ? new Date(trade.close_time).toLocaleString() : '-'}</td>
+                                                    <td className="p-4 text-[#e8f0f0]">{trade.pool_name || pool?.name || '-'}</td>
+                                                    <td className="p-4 font-semibold text-[#e8f0f0]">{trade.symbol}</td>
                                                     <td className="p-4">
                                                         {pair && (
-                                                            <span className={`px-2 py-1 rounded text-xs font-semibold ${getAssetTypeBadge(pair).color}`}>
-                                                                {getAssetTypeBadge(pair).label}
+                                                            <span className={`px-2 py-1 rounded text-xs font-semibold ${typeBadge.color}`}>
+                                                                {typeBadge.label}
                                                             </span>
                                                         )}
                                                     </td>
                                                     <td className="p-4">
-                                                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                                            trade.direction === 'BUY' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                                        }`}>
+                                                        <span className={`badge ${trade.direction === 'BUY' ? 'badge-success' : 'badge-danger'}`}>
                                                             {trade.direction}
                                                         </span>
                                                     </td>
-                                                    <td className="p-4">{parseFloat(trade.open_price).toFixed(pair?.priceDecimals || 4)}</td>
-                                                    <td className="p-4">{trade.close_price ? parseFloat(trade.close_price).toFixed(pair?.priceDecimals || 4) : '-'}</td>
-                                                    <td className="p-4">{trade.volume} {pair?.volumeLabel || ''}</td>
-                                                    <td className="p-4 font-semibold">${trade.entry_amount ? parseFloat(trade.entry_amount).toFixed(2) : '-'}</td>
-                                                    <td className="p-4 font-semibold">${trade.exit_amount ? parseFloat(trade.exit_amount).toFixed(2) : '-'}</td>
-                                                    <td className={`p-4 font-semibold ${(trade.profit_loss || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                        {trade.profit_loss ? `$${parseFloat(trade.profit_loss).toLocaleString()}` : '-'}
+                                                    <td className="p-4 text-[#e8f0f0]">{trade.lot_size || trade.volume || '-'}</td>
+                                                    <td className="p-4 text-[#e8f0f0]">{formatNumber(trade.open_price, pair?.priceDecimals || 4)}</td>
+                                                    <td className="p-4 text-[#e8f0f0]">{trade.close_price ? formatNumber(trade.close_price, pair?.priceDecimals || 4) : '-'}</td>
+                                                    <td className="p-4 font-semibold text-[#e8f0f0]">{formatCurrency(trade.stake || trade.entry_amount)}</td>
+                                                    <td className="p-4 font-semibold text-[#e8f0f0]">{formatCurrency(trade.return_amount || trade.exit_amount)}</td>
+                                                    <td className={`p-4 font-semibold ${(trade.profit_loss || 0) >= 0 ? 'text-[#00d4aa]' : 'text-[#ff6b6b]'}`}>
+                                                        {trade.profit_loss !== null && trade.profit_loss !== undefined 
+                                                            ? `${trade.profit_loss >= 0 ? '+' : ''}$${parseFloat(trade.profit_loss).toLocaleString()}` 
+                                                            : '-'
+                                                        }
                                                     </td>
                                                     <td className="p-4">
-                                                        <span className={`px-2 py-1 rounded text-xs ${
-                                                            trade.status === 'closed' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'
-                                                        }`}>
+                                                        <span className={`badge ${trade.status === 'closed' ? 'badge-gray' : 'badge-warning'}`}>
                                                             {trade.status}
                                                         </span>
                                                     </td>
-                                                    <td className="p-4 text-sm">{trade.closed_reason || '-'}</td>
+                                                    <td className="p-4 text-sm text-[#a0b4b8]">{trade.closed_reason || '-'}</td>
                                                 </tr>
                                             );
                                         })}
                                         {trades.length === 0 && (
                                             <tr>
-                                                <td colSpan="13" className="p-8 text-center text-gray-500">
+                                                <td colSpan="14" className="p-8 text-center text-[#a0b4b8]">
                                                     No trades found for this pool
                                                 </td>
                                             </tr>
@@ -742,20 +774,20 @@ const PoolTrades = () => {
 
                     {/* Open New Trade Modal */}
                     {showAddTradeModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                            <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto modal-dark">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-2xl font-bold">📊 Open New Trade</h2>
-                                    <button onClick={() => setShowAddTradeModal(false)} className="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+                                    <h2 className="text-2xl font-bold text-[#e8f0f0]">📊 Open New Trade</h2>
+                                    <button onClick={() => setShowAddTradeModal(false)} className="text-[#a0b4b8] hover:text-[#e8f0f0] text-2xl transition">✕</button>
                                 </div>
                                 <form onSubmit={handleAddTrade} className="space-y-4">
-                                    <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                                            📊 Direction: <strong>{formData.direction === 'BUY' ? '📈 LONG' : '📉 SHORT'}</strong>
+                                    <div className="bg-[#1c2426] p-3 rounded-lg border border-[#00d4aa]/20">
+                                        <p className="text-sm text-[#a0b4b8]">
+                                            📊 Direction: <strong className="text-[#e8f0f0]">{formData.direction === 'BUY' ? '📈 LONG' : '📉 SHORT'}</strong>
                                             {formData.direction === 'BUY' ? (
-                                                <span className="text-xs text-green-600 ml-2">(Stop Loss ↓ Below • Take Profit ↑ Above)</span>
+                                                <span className="text-xs text-[#00d4aa] ml-2">(Stop Loss ↓ Below • Take Profit ↑ Above)</span>
                                             ) : (
-                                                <span className="text-xs text-red-600 ml-2">(Stop Loss ↑ Above • Take Profit ↓ Below)</span>
+                                                <span className="text-xs text-[#ff6b6b] ml-2">(Stop Loss ↑ Above • Take Profit ↓ Below)</span>
                                             )}
                                         </p>
                                     </div>
@@ -767,7 +799,7 @@ const PoolTrades = () => {
                                     />
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Currency Pair <span className="text-red-500">*</span></label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Currency Pair <span className="text-[#ff6b6b]">*</span></label>
                                         <SearchableDropdown
                                             options={popularCurrencyPairs}
                                             value={formData.symbol}
@@ -777,10 +809,10 @@ const PoolTrades = () => {
                                                     ...formData, 
                                                     symbol,
                                                     open_price: '',
-                                                    volume: '',
+                                                    lot_size: '',
                                                     stop_loss: '',
                                                     take_profit: '',
-                                                    entry_amount: ''
+                                                    stake: ''
                                                 });
                                             }}
                                             placeholder="Search or type currency pair..."
@@ -790,16 +822,16 @@ const PoolTrades = () => {
                                                 <span className={`px-2 py-1 rounded text-xs font-semibold ${getAssetTypeBadge(selectedPair).color}`}>
                                                     {getAssetTypeBadge(selectedPair).label}
                                                 </span>
-                                                <span className="text-xs text-gray-500">
-                                                    Price: {selectedPair.priceDecimals} decimals • Volume: {selectedPair.volumeMin} - {selectedPair.volumeMax} {selectedPair.volumeLabel}
+                                                <span className="text-xs text-[#6a7e82]">
+                                                    Price: {selectedPair.priceDecimals} decimals • Lot Size: {selectedPair.volumeMin} - {selectedPair.volumeMax} {selectedPair.volumeLabel}
                                                 </span>
                                             </div>
                                         )}
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Direction <span className="text-red-500">*</span></label>
-                                        <select className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Direction <span className="text-[#ff6b6b]">*</span></label>
+                                        <select className="w-full p-2 border border-[#2a3538] rounded-lg bg-[#1c2426] text-[#e8f0f0] focus:outline-none focus:ring-2 focus:ring-[#00d4aa]"
                                             value={formData.direction} onChange={(e) => {
                                                 setFormData({...formData, direction: e.target.value});
                                             }} required>
@@ -809,12 +841,12 @@ const PoolTrades = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">{getPriceLabel(selectedPair)} <span className="text-red-500">*</span></label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">{getPriceLabel(selectedPair)} <span className="text-[#ff6b6b]">*</span></label>
                                         <input 
                                             type="number" 
                                             step={selectedPair ? `0.${'0'.repeat(selectedPair.priceDecimals - 1)}1` : '0.0001'}
                                             placeholder={getPricePlaceholder(selectedPair)} 
-                                            className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                            className="input-dark"
                                             value={formData.open_price} 
                                             onChange={(e) => {
                                                 const val = e.target.value;
@@ -832,40 +864,40 @@ const PoolTrades = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">{getVolumeLabel(selectedPair)} <span className="text-red-500">*</span></label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">{getVolumeLabel(selectedPair)} <span className="text-[#ff6b6b]">*</span></label>
                                         <input 
                                             type="number" 
                                             step={getVolumeStep(selectedPair)}
                                             placeholder={getVolumePlaceholder(selectedPair)} 
-                                            className="w-full p-2 border rounded-lg dark:bg-gray-700"
-                                            value={formData.volume} 
-                                            onChange={(e) => setFormData({...formData, volume: e.target.value})} 
+                                            className="input-dark"
+                                            value={formData.lot_size} 
+                                            onChange={(e) => setFormData({...formData, lot_size: e.target.value})} 
                                             required 
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Entry Amount ($) <span className="text-red-500">*</span></label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Stake ($) <span className="text-[#ff6b6b]">*</span></label>
                                         <input 
                                             type="number" 
                                             step="0.01"
-                                            placeholder="e.g., 35.00 (amount staked/traded)" 
-                                            className="w-full p-2 border rounded-lg dark:bg-gray-700"
-                                            value={formData.entry_amount} 
-                                            onChange={(e) => setFormData({...formData, entry_amount: e.target.value})} 
+                                            placeholder="e.g., 100.00 (amount staked/traded)" 
+                                            className="input-dark"
+                                            value={formData.stake} 
+                                            onChange={(e) => setFormData({...formData, stake: e.target.value})} 
                                             required 
                                         />
-                                        <p className="text-xs text-gray-500 mt-1">💰 The actual dollar amount you're trading/staking</p>
+                                        <p className="text-xs text-[#6a7e82] mt-1">💰 The actual dollar amount you're trading/staking</p>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-sm font-medium mb-1">Stop Loss</label>
+                                            <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Stop Loss</label>
                                             <input 
                                                 type="number" 
                                                 step={selectedPair ? `0.${'0'.repeat(selectedPair.priceDecimals - 1)}1` : '0.0001'}
                                                 placeholder="Optional" 
-                                                className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                                className="input-dark"
                                                 value={formData.stop_loss} 
                                                 onChange={(e) => {
                                                     const value = e.target.value;
@@ -877,10 +909,10 @@ const PoolTrades = () => {
                                                     {(() => {
                                                         const validation = validateSLTP(formData.stop_loss, 'stop_loss', formData.direction, formData.open_price);
                                                         if (!validation.valid) {
-                                                            return <p className="text-xs text-red-600">{validation.message}</p>;
+                                                            return <p className="text-xs text-[#ff6b6b]">{validation.message}</p>;
                                                         } else {
                                                             return (
-                                                                <p className="text-xs text-green-600">
+                                                                <p className="text-xs text-[#00d4aa]">
                                                                     ✅ Valid: Stop Loss is {formData.direction === 'BUY' ? 'below' : 'above'} opening price
                                                                 </p>
                                                             );
@@ -888,19 +920,19 @@ const PoolTrades = () => {
                                                     })()}
                                                 </div>
                                             )}
-                                            <p className="text-xs text-gray-500 mt-1">
+                                            <p className="text-xs text-[#6a7e82] mt-1">
                                                 {formData.direction === 'BUY' 
                                                     ? '📈 For BUY: Stop Loss must be BELOW opening price' 
                                                     : '📉 For SELL: Stop Loss must be ABOVE opening price'}
                                             </p>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium mb-1">Take Profit</label>
+                                            <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Take Profit</label>
                                             <input 
                                                 type="number" 
                                                 step={selectedPair ? `0.${'0'.repeat(selectedPair.priceDecimals - 1)}1` : '0.0001'}
                                                 placeholder="Optional" 
-                                                className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                                className="input-dark"
                                                 value={formData.take_profit} 
                                                 onChange={(e) => {
                                                     const value = e.target.value;
@@ -912,10 +944,10 @@ const PoolTrades = () => {
                                                     {(() => {
                                                         const validation = validateSLTP(formData.take_profit, 'take_profit', formData.direction, formData.open_price);
                                                         if (!validation.valid) {
-                                                            return <p className="text-xs text-red-600">{validation.message}</p>;
+                                                            return <p className="text-xs text-[#ff6b6b]">{validation.message}</p>;
                                                         } else {
                                                             return (
-                                                                <p className="text-xs text-green-600">
+                                                                <p className="text-xs text-[#00d4aa]">
                                                                     ✅ Valid: Take Profit is {formData.direction === 'BUY' ? 'above' : 'below'} opening price
                                                                 </p>
                                                             );
@@ -923,7 +955,7 @@ const PoolTrades = () => {
                                                     })()}
                                                 </div>
                                             )}
-                                            <p className="text-xs text-gray-500 mt-1">
+                                            <p className="text-xs text-[#6a7e82] mt-1">
                                                 {formData.direction === 'BUY' 
                                                     ? '📈 For BUY: Take Profit must be ABOVE opening price' 
                                                     : '📉 For SELL: Take Profit must be BELOW opening price'}
@@ -932,47 +964,47 @@ const PoolTrades = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Notes</label>
-                                        <textarea placeholder="Add notes about this trade" rows="2" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Notes</label>
+                                        <textarea placeholder="Add notes about this trade" rows="2" className="input-dark"
                                             value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} />
                                     </div>
 
-                                    <div className="flex justify-end space-x-3 pt-4 border-t dark:border-gray-700">
-                                        <button type="button" onClick={() => setShowAddTradeModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">Cancel</button>
-                                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">✅ Open Trade</button>
+                                    <div className="flex justify-end space-x-3 pt-4 border-t border-[#2a3538]">
+                                        <button type="button" onClick={() => setShowAddTradeModal(false)} className="btn btn-outline">Cancel</button>
+                                        <button type="submit" className="btn btn-primary">✅ Open Trade</button>
                                     </div>
                                 </form>
                             </div>
                         </div>
                     )}
 
-                    {/* Close Trade Modal */}
+                    {/* Close Trade Modal - P/L AUTO-CALCULATED DISPLAY ONLY */}
                     {showCloseTradeModal && closingTrade && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                            <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto modal-dark">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-2xl font-bold">🔒 Close Trade</h2>
+                                    <h2 className="text-2xl font-bold text-[#e8f0f0]">🔒 Close Trade</h2>
                                     <button onClick={() => {
                                         setShowCloseTradeModal(false);
                                         setClosingTrade(null);
-                                    }} className="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+                                    }} className="text-[#a0b4b8] hover:text-[#e8f0f0] text-2xl transition">✕</button>
                                 </div>
                                 <form onSubmit={confirmCloseTrade} className="space-y-4">
-                                    <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                                            Closing Trade: <strong>{closingTrade.symbol}</strong>
+                                    <div className="bg-[#1c2426] p-3 rounded-lg border border-[#ffd93d]/20">
+                                        <p className="text-sm text-[#a0b4b8]">
+                                            Closing Trade: <strong className="text-[#e8f0f0]">{closingTrade.symbol}</strong>
                                         </p>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                        <p className="text-sm text-[#a0b4b8]">
                                             Open Time: {new Date(closingTrade.open_time).toLocaleString()}
                                         </p>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                                            Entry Price: {parseFloat(closingTrade.open_price).toFixed(selectedClosePair?.priceDecimals || 4)}
+                                        <p className="text-sm text-[#a0b4b8]">
+                                            Entry Price: {formatNumber(closingTrade.open_price, selectedClosePair?.priceDecimals || 4)}
                                         </p>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                                            Entry Amount: ${closingTrade.entry_amount ? parseFloat(closingTrade.entry_amount).toFixed(2) : '-'}
+                                        <p className="text-sm text-[#a0b4b8]">
+                                            Lot Size: <strong className="text-[#e8f0f0]">{closingTrade.lot_size || closingTrade.volume || '-'}</strong>
                                         </p>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                                            Volume: {closingTrade.volume} {selectedClosePair?.volumeLabel || ''}
+                                        <p className="text-sm text-[#a0b4b8]">
+                                            Stake: <strong className="text-[#00d4aa]">{formatCurrency(closingTrade.stake || closingTrade.entry_amount)}</strong>
                                         </p>
                                         {selectedClosePair && (
                                             <span className={`inline-block mt-1 px-2 py-1 rounded text-xs font-semibold ${getAssetTypeBadge(selectedClosePair).color}`}>
@@ -988,27 +1020,27 @@ const PoolTrades = () => {
                                     />
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Currency Pair</label>
-                                        <div className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold">
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Currency Pair</label>
+                                        <div className="w-full p-2 bg-[#1c2426] border border-[#2a3538] rounded-lg font-semibold text-[#e8f0f0]">
                                             {closingTrade.symbol}
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Volume (Fixed from Opening)</label>
-                                        <div className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-lg font-semibold">
-                                            {closingTrade.volume} {selectedClosePair?.volumeLabel || ''}
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Lot Size (Fixed from Opening)</label>
+                                        <div className="w-full p-2 bg-[#1c2426] border border-[#2a3538] rounded-lg font-semibold text-[#e8f0f0]">
+                                            {closingTrade.lot_size || closingTrade.volume || '-'}
                                         </div>
-                                        <p className="text-xs text-gray-500 mt-1">🔒 Volume is fixed and cannot be changed when closing</p>
+                                        <p className="text-xs text-[#6a7e82] mt-1">🔒 Lot Size is fixed and cannot be changed when closing</p>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">{getPriceLabel(selectedClosePair)} <span className="text-red-500">*</span></label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">{getPriceLabel(selectedClosePair)} <span className="text-[#ff6b6b]">*</span></label>
                                         <input 
                                             type="number" 
                                             step={selectedClosePair ? `0.${'0'.repeat(selectedClosePair.priceDecimals - 1)}1` : '0.0001'}
                                             placeholder={getPricePlaceholder(selectedClosePair)} 
-                                            className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                            className="input-dark"
                                             value={closeFormData.close_price} 
                                             onChange={(e) => setCloseFormData({...closeFormData, close_price: e.target.value})} 
                                             required 
@@ -1016,36 +1048,40 @@ const PoolTrades = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Exit Amount ($) <span className="text-red-500">*</span></label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Return ($) <span className="text-[#ff6b6b]">*</span></label>
                                         <input 
                                             type="number" 
                                             step="0.01"
                                             placeholder="e.g., 45.00 (amount received/closed)" 
-                                            className="w-full p-2 border rounded-lg dark:bg-gray-700"
-                                            value={closeFormData.exit_amount} 
-                                            onChange={(e) => setCloseFormData({...closeFormData, exit_amount: e.target.value})} 
+                                            className="input-dark"
+                                            value={closeFormData.return_amount} 
+                                            onChange={(e) => {
+                                                setCloseFormData({...closeFormData, return_amount: e.target.value});
+                                            }} 
                                             required 
                                         />
-                                        <p className="text-xs text-gray-500 mt-1">💰 The actual dollar amount you're closing the trade with</p>
+                                        <p className="text-xs text-[#6a7e82] mt-1">💰 The actual dollar amount you're closing the trade with</p>
+                                    </div>
+
+                                    {/* P/L - AUTO-CALCULATED DISPLAY ONLY */}
+                                    <div className="bg-[#1c2426] p-4 rounded-lg border-2 border-[#00d4aa]/30">
+                                        <p className="text-sm font-semibold text-center text-[#a0b4b8]">
+                                            📊 Profit/Loss (Auto-Calculated)
+                                        </p>
+                                        <p className={`text-2xl font-bold text-center ${calculatedPL >= 0 ? 'text-[#00d4aa]' : 'text-[#ff6b6b]'}`}>
+                                            {calculatedPL >= 0 ? '+' : ''}${calculatedPL.toFixed(2)}
+                                        </p>
+                                        <p className="text-xs text-[#6a7e82] text-center mt-1">
+                                            Return - Stake = {closeFormData.return_amount || '0'} - {closingTrade?.stake || closingTrade?.entry_amount || '0'} = {calculatedPL.toFixed(2)}
+                                        </p>
+                                        <p className="text-xs text-[#6a7e82] text-center mt-1">
+                                            🔒 Auto-calculated - No manual entry needed
+                                        </p>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Profit/Loss ($) <span className="text-red-500">*</span></label>
-                                        <input 
-                                            type="number" 
-                                            step="0.01"
-                                            placeholder="e.g., 10.00 (profit) or -5.00 (loss)" 
-                                            className="w-full p-2 border rounded-lg dark:bg-gray-700"
-                                            value={closeFormData.profit_loss} 
-                                            onChange={(e) => setCloseFormData({...closeFormData, profit_loss: e.target.value})} 
-                                            required 
-                                        />
-                                        <p className="text-xs text-gray-500 mt-1">📊 Exit Amount - Entry Amount = Profit/Loss</p>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Reason for Closing</label>
-                                        <select className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Reason for Closing</label>
+                                        <select className="w-full p-2 border border-[#2a3538] rounded-lg bg-[#1c2426] text-[#e8f0f0] focus:outline-none focus:ring-2 focus:ring-[#00d4aa]"
                                             value={closeFormData.closed_reason} onChange={(e) => setCloseFormData({...closeFormData, closed_reason: e.target.value})}>
                                             <option value="">Select reason (optional)</option>
                                             <option value="Take Profit Attained">✅ Take Profit Attained</option>
@@ -1055,16 +1091,16 @@ const PoolTrades = () => {
                                             <option value="Manual Close">✋ Manual Close</option>
                                             <option value="Other">Other</option>
                                         </select>
-                                        <input type="text" placeholder="Or type custom reason..." className="w-full p-2 border rounded-lg dark:bg-gray-700 mt-2"
+                                        <input type="text" placeholder="Or type custom reason..." className="input-dark mt-2"
                                             value={closeFormData.closed_reason} onChange={(e) => setCloseFormData({...closeFormData, closed_reason: e.target.value})} />
                                     </div>
 
-                                    <div className="flex justify-end space-x-3 pt-4 border-t dark:border-gray-700">
+                                    <div className="flex justify-end space-x-3 pt-4 border-t border-[#2a3538]">
                                         <button type="button" onClick={() => {
                                             setShowCloseTradeModal(false);
                                             setClosingTrade(null);
-                                        }} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">Cancel</button>
-                                        <button type="submit" className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">🔒 Close Trade</button>
+                                        }} className="btn btn-outline">Cancel</button>
+                                        <button type="submit" className="btn btn-danger">🔒 Close Trade</button>
                                     </div>
                                 </form>
                             </div>

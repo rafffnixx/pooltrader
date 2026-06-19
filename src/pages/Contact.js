@@ -35,70 +35,73 @@ const Contact = () => {
         <>
             <SEO title="Contact Us - PoolTrader" description="Contact PoolTrader support team" />
             
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="min-h-screen bg-[#0a0e0f]">
                 <div className="container mx-auto px-4 py-8">
                     <div className="max-w-4xl mx-auto">
+                        {/* Back Button */}
                         <div className="mb-8">
-                            <Link to="/" className="text-blue-600 hover:text-blue-700">← Back to Home</Link>
+                            <Link to="/" className="text-[#00d4aa] hover:text-[#33ddbb] font-medium transition inline-flex items-center gap-2">
+                                ← Back to Home
+                            </Link>
                         </div>
                         
                         <div className="grid md:grid-cols-2 gap-8">
                             {/* Contact Form */}
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-                                <h1 className="text-2xl font-bold mb-4">Contact Us</h1>
-                                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 card-hover">
+                                <h1 className="text-2xl font-bold text-[#e8f0f0] mb-4">Contact Us</h1>
+                                <p className="text-[#a0b4b8] mb-6">
                                     Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
                                 </p>
                                 
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Name *</label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Name <span className="text-[#ff6b6b]">*</span></label>
                                         <input
                                             type="text"
                                             name="name"
                                             value={formData.name}
                                             onChange={handleChange}
                                             required
-                                            className="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+                                            className="input-dark"
                                             placeholder="Your name"
                                         />
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Email *</label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Email <span className="text-[#ff6b6b]">*</span></label>
                                         <input
                                             type="email"
                                             name="email"
                                             value={formData.email}
                                             onChange={handleChange}
                                             required
-                                            className="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+                                            className="input-dark"
                                             placeholder="your@email.com"
                                         />
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Subject *</label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Subject <span className="text-[#ff6b6b]">*</span></label>
                                         <input
                                             type="text"
                                             name="subject"
                                             value={formData.subject}
                                             onChange={handleChange}
                                             required
-                                            className="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+                                            className="input-dark"
                                             placeholder="What is this regarding?"
                                         />
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Message *</label>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Message <span className="text-[#ff6b6b]">*</span></label>
                                         <textarea
                                             name="message"
                                             value={formData.message}
                                             onChange={handleChange}
                                             required
                                             rows="5"
-                                            className="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+                                            className="input-dark resize-none"
                                             placeholder="Please provide details about your inquiry..."
                                         />
                                     </div>
@@ -106,67 +109,75 @@ const Contact = () => {
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                                        className="w-full btn btn-primary btn-lg"
                                     >
-                                        {submitting ? 'Sending...' : 'Send Message'}
+                                        {submitting ? (
+                                            <span className="flex items-center justify-center">
+                                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#0a0e0f]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Sending...
+                                            </span>
+                                        ) : 'Send Message'}
                                     </button>
                                 </form>
                             </div>
                             
                             {/* Contact Information */}
                             <div className="space-y-6">
-                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-                                    <h2 className="text-xl font-bold mb-4">Get in Touch</h2>
+                                <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 card-hover">
+                                    <h2 className="text-xl font-bold text-[#e8f0f0] mb-4">Get in Touch</h2>
                                     <div className="space-y-4">
-                                        <div className="flex items-start gap-3">
+                                        <div className="flex items-start gap-3 p-3 bg-[#1c2426] rounded-xl">
                                             <div className="text-2xl">📧</div>
                                             <div>
-                                                <p className="font-semibold">Email</p>
-                                                <p className="text-gray-600 dark:text-gray-400">support@pooltrader.com</p>
+                                                <p className="font-semibold text-[#e8f0f0]">Email</p>
+                                                <p className="text-[#a0b4b8]">support@pooltrader.com</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-start gap-3">
+                                        <div className="flex items-start gap-3 p-3 bg-[#1c2426] rounded-xl">
                                             <div className="text-2xl">💬</div>
                                             <div>
-                                                <p className="font-semibold">Response Time</p>
-                                                <p className="text-gray-600 dark:text-gray-400">24-48 hours</p>
+                                                <p className="font-semibold text-[#e8f0f0]">Response Time</p>
+                                                <p className="text-[#a0b4b8]">24-48 hours</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-start gap-3">
+                                        <div className="flex items-start gap-3 p-3 bg-[#1c2426] rounded-xl">
                                             <div className="text-2xl">🌐</div>
                                             <div>
-                                                <p className="font-semibold">Website</p>
-                                                <p className="text-gray-600 dark:text-gray-400">https://pooltrader.vercel.app</p>
+                                                <p className="font-semibold text-[#e8f0f0]">Website</p>
+                                                <p className="text-[#a0b4b8]">https://pooltrader.vercel.app</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-                                    <h2 className="text-xl font-bold mb-4">Support Hours</h2>
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between">
-                                            <span>Monday - Friday</span>
-                                            <span className="font-semibold">9:00 AM - 6:00 PM (EST)</span>
+                                <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 card-hover">
+                                    <h2 className="text-xl font-bold text-[#e8f0f0] mb-4">Support Hours</h2>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between py-2 border-b border-[#2a3538]">
+                                            <span className="text-[#a0b4b8]">Monday - Friday</span>
+                                            <span className="font-semibold text-[#e8f0f0]">9:00 AM - 6:00 PM (EST)</span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Saturday</span>
-                                            <span className="font-semibold">10:00 AM - 4:00 PM (EST)</span>
+                                        <div className="flex justify-between py-2 border-b border-[#2a3538]">
+                                            <span className="text-[#a0b4b8]">Saturday</span>
+                                            <span className="font-semibold text-[#e8f0f0]">10:00 AM - 4:00 PM (EST)</span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Sunday</span>
-                                            <span className="font-semibold">Closed</span>
+                                        <div className="flex justify-between py-2">
+                                            <span className="text-[#a0b4b8]">Sunday</span>
+                                            <span className="font-semibold text-[#ff6b6b]">Closed</span>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl shadow-xl p-6">
-                                    <h2 className="text-xl font-bold mb-3">Quick Links</h2>
+                                <div className="bg-gradient-to-r from-[#00d4aa]/10 to-[#00b894]/10 border border-[#00d4aa]/20 rounded-2xl p-6 card-hover">
+                                    <h2 className="text-xl font-bold text-[#e8f0f0] mb-3">Quick Links</h2>
                                     <div className="space-y-2">
-                                        <Link to="/faq" className="block text-blue-600 hover:text-blue-700">FAQ</Link>
-                                        <Link to="/privacy" className="block text-blue-600 hover:text-blue-700">Privacy Policy</Link>
-                                        <Link to="/terms" className="block text-blue-600 hover:text-blue-700">Terms of Service</Link>
-                                        <Link to="/about" className="block text-blue-600 hover:text-blue-700">About Us</Link>
+                                        <Link to="/faq" className="block text-[#00d4aa] hover:text-[#33ddbb] transition font-medium">FAQ</Link>
+                                        <Link to="/privacy" className="block text-[#00d4aa] hover:text-[#33ddbb] transition font-medium">Privacy Policy</Link>
+                                        <Link to="/terms" className="block text-[#00d4aa] hover:text-[#33ddbb] transition font-medium">Terms of Service</Link>
+                                        <Link to="/about" className="block text-[#00d4aa] hover:text-[#33ddbb] transition font-medium">About Us</Link>
                                     </div>
                                 </div>
                             </div>

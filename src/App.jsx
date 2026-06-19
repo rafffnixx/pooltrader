@@ -4,7 +4,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import './index.css';
 
 // Import pages
-import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ActivePool from './pages/ActivePool';
 import Contribute from './pages/Contribute';
@@ -25,14 +24,9 @@ import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
 import VerifyEmail from './pages/VerifyEmail';
 
+// Test pages (keep for debugging)
 import TestPage from './pages/TestPage';
-
-
-
-
 import TestTrades from './pages/TestTrades';
-
-
 
 // Import components
 import Navbar from './components/Navbar';
@@ -46,12 +40,17 @@ function App() {
     <HelmetProvider>
       <AuthProvider>
         <Router>
-          <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen flex flex-col bg-[#0a0e0f]">
             <Navbar />
             <main className="flex-grow">
               <Routes>
-                <Route path="/" element={<Home />} />
+                {/* Home is now Dashboard */}
+                <Route path="/" element={<Dashboard />} />
+                
+                {/* Dashboard route (redirects to home or keep as alias) */}
                 <Route path="/dashboard" element={<Dashboard />} />
+                
+                {/* Main routes */}
                 <Route path="/pools/active" element={<ActivePool />} />
                 <Route path="/contribute" element={<Contribute />} />
                 <Route path="/history" element={<History />} />
@@ -68,17 +67,14 @@ function App() {
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/faq" element={<FAQ />} />
-                <Route path="*" element={<NotFound />} />
                 <Route path="/verify-email/:code" element={<VerifyEmail />} />
-
-
+                
+                {/* Test routes */}
                 <Route path="/test/:poolId" element={<TestTrades />} />
-
-
                 <Route path="/test" element={<TestPage />} />
-
-
-
+                
+                {/* 404 - Keep last */}
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
             <Footer />

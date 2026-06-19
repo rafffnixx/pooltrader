@@ -26,6 +26,14 @@ const Customers = () => {
         managerFeeAmount: 0
     });
 
+    // Helper function to format currency
+    const formatCurrency = (value) => {
+        if (value === null || value === undefined) return '-';
+        const num = parseFloat(value);
+        if (isNaN(num)) return '-';
+        return `$${num.toLocaleString()}`;
+    };
+
     useEffect(() => {
         if (user?.isAdmin) {
             fetchAllUsers();
@@ -164,16 +172,16 @@ const Customers = () => {
 
         if (modalType === 'deposit') {
             return (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 max-w-md w-full modal-dark">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold">💰 Record Deposit</h2>
-                            <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+                            <h2 className="text-2xl font-bold text-[#e8f0f0]">💰 Record Deposit</h2>
+                            <button onClick={() => setShowModal(false)} className="text-[#a0b4b8] hover:text-[#e8f0f0] text-2xl transition">✕</button>
                         </div>
                         <form onSubmit={handleDeposit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">Select Customer</label>
-                                <select className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Select Customer</label>
+                                <select className="w-full p-2 border border-[#2a3538] rounded-xl bg-[#1c2426] text-[#e8f0f0] focus:outline-none focus:ring-2 focus:ring-[#00d4aa]"
                                     onChange={(e) => setFormData({...formData, user_id: e.target.value})} required>
                                     <option value="">Select Customer</option>
                                     {users.map(u => (
@@ -182,13 +190,13 @@ const Customers = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Amount ($)</label>
-                                <input type="number" step="0.01" placeholder="Amount" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Amount ($)</label>
+                                <input type="number" step="0.01" placeholder="Amount" className="input-dark"
                                     onChange={(e) => setFormData({...formData, amount: e.target.value})} required />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Payment Method</label>
-                                <select className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Payment Method</label>
+                                <select className="w-full p-2 border border-[#2a3538] rounded-xl bg-[#1c2426] text-[#e8f0f0] focus:outline-none focus:ring-2 focus:ring-[#00d4aa]"
                                     onChange={(e) => setFormData({...formData, payment_method: e.target.value})} required>
                                     <option value="">Select Method</option>
                                     <option value="bank_transfer">🏦 Bank Transfer</option>
@@ -198,17 +206,13 @@ const Customers = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Reference Number</label>
-                                <input type="text" placeholder="Reference Number" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Reference Number</label>
+                                <input type="text" placeholder="Reference Number" className="input-dark"
                                     onChange={(e) => setFormData({...formData, reference_number: e.target.value})} />
                             </div>
-                            <div className="flex justify-end space-x-3 pt-4">
-                                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
-                                    Cancel
-                                </button>
-                                <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                                    Process Deposit
-                                </button>
+                            <div className="flex justify-end space-x-3 pt-4 border-t border-[#2a3538]">
+                                <button type="button" onClick={() => setShowModal(false)} className="btn btn-outline">Cancel</button>
+                                <button type="submit" className="btn btn-success">Process Deposit</button>
                             </div>
                         </form>
                     </div>
@@ -218,52 +222,52 @@ const Customers = () => {
 
         if (modalType === 'profit') {
             return (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto modal-dark">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold">📊 Calculate & Distribute Profits</h2>
-                            <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+                            <h2 className="text-2xl font-bold text-[#e8f0f0]">📊 Calculate & Distribute Profits</h2>
+                            <button onClick={() => setShowModal(false)} className="text-[#a0b4b8] hover:text-[#e8f0f0] text-2xl transition">✕</button>
                         </div>
                         
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">Select Pool</label>
-                                <select className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Select Pool</label>
+                                <select className="w-full p-2 border border-[#2a3538] rounded-xl bg-[#1c2426] text-[#e8f0f0] focus:outline-none focus:ring-2 focus:ring-[#00d4aa]"
                                     value={profitCalculation.poolId}
                                     onChange={(e) => setProfitCalculation({...profitCalculation, poolId: e.target.value})}>
                                     <option value="">Select Pool</option>
                                     {activePools.map(p => (
                                         <option key={p.id} value={p.id}>
-                                            {p.name} (${parseFloat(p.current_total).toLocaleString()} / ${parseFloat(p.total_target).toLocaleString()})
+                                            {p.name} ({formatCurrency(p.current_total)} / {formatCurrency(p.total_target)})
                                         </option>
                                     ))}
                                 </select>
                             </div>
                             
                             <div>
-                                <label className="block text-sm font-medium mb-1">Total Pool Amount</label>
-                                <input type="number" step="0.01" placeholder="Total Pool Amount" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Total Pool Amount</label>
+                                <input type="number" step="0.01" placeholder="Total Pool Amount" className="input-dark"
                                     value={profitCalculation.totalPool}
                                     onChange={(e) => setProfitCalculation({...profitCalculation, totalPool: parseFloat(e.target.value)})} />
                             </div>
                             
                             <div>
-                                <label className="block text-sm font-medium mb-1">Customer's Contribution Amount</label>
-                                <input type="number" step="0.01" placeholder="User Contribution" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Customer's Contribution Amount</label>
+                                <input type="number" step="0.01" placeholder="User Contribution" className="input-dark"
                                     value={profitCalculation.userContribution}
                                     onChange={(e) => setProfitCalculation({...profitCalculation, userContribution: parseFloat(e.target.value)})} />
                             </div>
                             
                             <div>
-                                <label className="block text-sm font-medium mb-1">Total Profit Made</label>
-                                <input type="number" step="0.01" placeholder="Total Profit" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Total Profit Made</label>
+                                <input type="number" step="0.01" placeholder="Total Profit" className="input-dark"
                                     value={profitCalculation.totalProfit}
                                     onChange={(e) => setProfitCalculation({...profitCalculation, totalProfit: parseFloat(e.target.value)})} />
                             </div>
                             
                             <div>
-                                <label className="block text-sm font-medium mb-1">Management Fee (%)</label>
-                                <input type="number" step="0.5" placeholder="Management Fee %" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Management Fee (%)</label>
+                                <input type="number" step="0.5" placeholder="Management Fee %" className="input-dark"
                                     value={profitCalculation.managementFee}
                                     onChange={(e) => setProfitCalculation({...profitCalculation, managementFee: parseFloat(e.target.value)})} />
                             </div>
@@ -271,40 +275,36 @@ const Customers = () => {
                             <button
                                 type="button"
                                 onClick={calculateProfit}
-                                className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                                className="w-full btn btn-primary"
                             >
                                 Calculate Profit
                             </button>
                             
                             {profitCalculation.userProfit > 0 && (
-                                <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl p-4 space-y-2">
-                                    <h3 className="font-bold text-lg">Profit Breakdown:</h3>
-                                    <div className="flex justify-between">
+                                <div className="bg-[#1c2426] rounded-xl p-4 space-y-2 border border-[#00d4aa]/20">
+                                    <h3 className="font-bold text-lg text-[#e8f0f0]">Profit Breakdown:</h3>
+                                    <div className="flex justify-between text-[#a0b4b8]">
                                         <span>Customer's Share Percentage:</span>
-                                        <span className="font-semibold">{profitCalculation.userPercentage.toFixed(2)}%</span>
+                                        <span className="font-semibold text-[#e8f0f0]">{profitCalculation.userPercentage.toFixed(2)}%</span>
                                     </div>
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between text-[#a0b4b8]">
                                         <span>Gross Profit for Customer:</span>
-                                        <span className="font-semibold text-green-600">${(profitCalculation.userProfit + profitCalculation.managerFeeAmount).toFixed(2)}</span>
+                                        <span className="font-semibold text-[#00d4aa]">{formatCurrency(profitCalculation.userProfit + profitCalculation.managerFeeAmount)}</span>
                                     </div>
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between text-[#a0b4b8]">
                                         <span>Management Fee ({profitCalculation.managementFee}%):</span>
-                                        <span className="font-semibold text-orange-600">${profitCalculation.managerFeeAmount.toFixed(2)}</span>
+                                        <span className="font-semibold text-[#ffd93d]">{formatCurrency(profitCalculation.managerFeeAmount)}</span>
                                     </div>
-                                    <div className="flex justify-between pt-2 border-t">
-                                        <span className="font-bold">Net Profit to Customer:</span>
-                                        <span className="font-bold text-green-600">${profitCalculation.userProfit.toFixed(2)}</span>
+                                    <div className="flex justify-between pt-2 border-t border-[#2a3538]">
+                                        <span className="font-bold text-[#e8f0f0]">Net Profit to Customer:</span>
+                                        <span className="font-bold text-[#00d4aa]">{formatCurrency(profitCalculation.userProfit)}</span>
                                     </div>
                                 </div>
                             )}
                             
-                            <div className="flex justify-end space-x-3 pt-4">
-                                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
-                                    Cancel
-                                </button>
-                                <button onClick={handleProfitDistribution} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
-                                    Distribute Profits
-                                </button>
+                            <div className="flex justify-end space-x-3 pt-4 border-t border-[#2a3538]">
+                                <button type="button" onClick={() => setShowModal(false)} className="btn btn-outline">Cancel</button>
+                                <button onClick={handleProfitDistribution} className="btn btn-primary">Distribute Profits</button>
                             </div>
                         </div>
                     </div>
@@ -314,31 +314,31 @@ const Customers = () => {
 
         if (modalType === 'withdrawal') {
             return (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 max-w-md w-full modal-dark">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold">💸 Process Withdrawal</h2>
-                            <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+                            <h2 className="text-2xl font-bold text-[#e8f0f0]">💸 Process Withdrawal</h2>
+                            <button onClick={() => setShowModal(false)} className="text-[#a0b4b8] hover:text-[#e8f0f0] text-2xl transition">✕</button>
                         </div>
                         <form onSubmit={handleWithdrawalRequest} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">Select Customer</label>
-                                <select className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Select Customer</label>
+                                <select className="w-full p-2 border border-[#2a3538] rounded-xl bg-[#1c2426] text-[#e8f0f0] focus:outline-none focus:ring-2 focus:ring-[#00d4aa]"
                                     onChange={(e) => setFormData({...formData, user_id: e.target.value})} required>
                                     <option value="">Select Customer</option>
                                     {users.map(u => (
-                                        <option key={u.id} value={u.id}>{u.full_name} (Balance: ${parseFloat(u.current_balance || 0).toLocaleString()})</option>
+                                        <option key={u.id} value={u.id}>{u.full_name} (Balance: {formatCurrency(u.current_balance)})</option>
                                     ))}
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Withdrawal Amount ($)</label>
-                                <input type="number" step="0.01" placeholder="Amount" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Withdrawal Amount ($)</label>
+                                <input type="number" step="0.01" placeholder="Amount" className="input-dark"
                                     onChange={(e) => setFormData({...formData, amount: e.target.value})} required />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Payment Method</label>
-                                <select className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Payment Method</label>
+                                <select className="w-full p-2 border border-[#2a3538] rounded-xl bg-[#1c2426] text-[#e8f0f0] focus:outline-none focus:ring-2 focus:ring-[#00d4aa]"
                                     onChange={(e) => setFormData({...formData, payment_method: e.target.value})} required>
                                     <option value="">Select Method</option>
                                     <option value="bank_transfer">🏦 Bank Transfer</option>
@@ -347,17 +347,13 @@ const Customers = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Notes</label>
-                                <textarea placeholder="Notes" rows="2" className="w-full p-2 border rounded-lg dark:bg-gray-700"
+                                <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Notes</label>
+                                <textarea placeholder="Notes" rows="2" className="input-dark"
                                     onChange={(e) => setFormData({...formData, notes: e.target.value})} />
                             </div>
-                            <div className="flex justify-end space-x-3 pt-4">
-                                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
-                                    Cancel
-                                </button>
-                                <button type="submit" className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition">
-                                    Request Withdrawal
-                                </button>
+                            <div className="flex justify-end space-x-3 pt-4 border-t border-[#2a3538]">
+                                <button type="button" onClick={() => setShowModal(false)} className="btn btn-outline">Cancel</button>
+                                <button type="submit" className="btn btn-warning">Request Withdrawal</button>
                             </div>
                         </form>
                     </div>
@@ -367,63 +363,61 @@ const Customers = () => {
 
         if (modalType === 'userDetails' && userDetails) {
             return (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto modal-dark">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold">Customer Details</h2>
-                            <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+                            <h2 className="text-2xl font-bold text-[#e8f0f0]">Customer Details</h2>
+                            <button onClick={() => setShowModal(false)} className="text-[#a0b4b8] hover:text-[#e8f0f0] text-2xl transition">✕</button>
                         </div>
                         
-                        <div className="grid md:grid-cols-2 gap-4 mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl">
+                        <div className="grid md:grid-cols-2 gap-4 mb-6 p-4 bg-[#1c2426] rounded-xl border border-[#2a3538]">
                             <div>
-                                <p className="text-sm text-gray-500">Full Name</p>
-                                <p className="font-semibold text-lg">{userDetails.user.full_name}</p>
+                                <p className="text-sm text-[#6a7e82]">Full Name</p>
+                                <p className="font-semibold text-lg text-[#e8f0f0]">{userDetails.user.full_name}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Email</p>
-                                <p className="font-semibold">{userDetails.user.email}</p>
+                                <p className="text-sm text-[#6a7e82]">Email</p>
+                                <p className="font-semibold text-[#e8f0f0]">{userDetails.user.email}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Current Balance</p>
-                                <p className="font-semibold text-2xl text-green-600">${userDetails.user.current_balance?.toLocaleString()}</p>
+                                <p className="text-sm text-[#6a7e82]">Current Balance</p>
+                                <p className="font-semibold text-2xl text-[#00d4aa]">{formatCurrency(userDetails.user.current_balance)}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Total Deposited</p>
-                                <p className="font-semibold text-blue-600">${userDetails.user.total_deposited?.toLocaleString()}</p>
+                                <p className="text-sm text-[#6a7e82]">Total Deposited</p>
+                                <p className="font-semibold text-[#4aa0ff]">{formatCurrency(userDetails.user.total_deposited)}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Total Withdrawn</p>
-                                <p className="font-semibold text-red-600">${userDetails.user.total_withdrawn?.toLocaleString()}</p>
+                                <p className="text-sm text-[#6a7e82]">Total Withdrawn</p>
+                                <p className="font-semibold text-[#ff6b6b]">{formatCurrency(userDetails.user.total_withdrawn)}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Joined Date</p>
-                                <p className="font-semibold">{new Date(userDetails.user.joined_date).toLocaleDateString()}</p>
+                                <p className="text-sm text-[#6a7e82]">Joined Date</p>
+                                <p className="font-semibold text-[#e8f0f0]">{new Date(userDetails.user.joined_date).toLocaleDateString()}</p>
                             </div>
                         </div>
                         
-                        <h3 className="text-xl font-bold mb-3">Transaction History</h3>
+                        <h3 className="text-xl font-bold text-[#e8f0f0] mb-3">Transaction History</h3>
                         <div className="overflow-x-auto mb-4">
-                            <table className="w-full text-sm">
-                                <thead className="bg-gray-100 dark:bg-gray-700">
+                            <table className="table-dark">
+                                <thead>
                                     <tr>
-                                        <th className="p-3 text-left">Date</th>
-                                        <th className="p-3 text-left">Type</th>
-                                        <th className="p-3 text-left">Amount</th>
-                                        <th className="p-3 text-left">Status</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {userDetails.transactions?.map(t => (
-                                        <tr key={t.id} className="border-b dark:border-gray-700">
-                                            <td className="p-3">{new Date(t.created_at).toLocaleDateString()}</td>
-                                            <td className="p-3 capitalize">{t.type}</td>
-                                            <td className={`p-3 font-semibold ${t.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                ${Math.abs(t.amount).toLocaleString()}
+                                        <tr key={t.id} className="hover:bg-[#1c2426] transition">
+                                            <td className="p-4 text-[#a0b4b8]">{new Date(t.created_at).toLocaleDateString()}</td>
+                                            <td className="p-4 capitalize text-[#e8f0f0]">{t.type}</td>
+                                            <td className={`p-4 font-semibold ${t.amount > 0 ? 'text-[#00d4aa]' : 'text-[#ff6b6b]'}`}>
+                                                {formatCurrency(t.amount)}
                                             </td>
-                                            <td className="p-3">
-                                                <span className={`px-2 py-1 rounded text-xs ${
-                                                    t.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                                }`}>
+                                            <td className="p-4">
+                                                <span className={`badge ${t.status === 'completed' ? 'badge-success' : 'badge-warning'}`}>
                                                     {t.status}
                                                 </span>
                                             </td>
@@ -434,10 +428,10 @@ const Customers = () => {
                         </div>
                         
                         <div className="flex justify-end space-x-3">
-                            <button onClick={() => handleResetUserPassword(userDetails.user.id)} className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition">
+                            <button onClick={() => handleResetUserPassword(userDetails.user.id)} className="btn btn-warning">
                                 Reset Password
                             </button>
-                            <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            <button onClick={() => setShowModal(false)} className="btn btn-primary">
                                 Close
                             </button>
                         </div>
@@ -451,10 +445,10 @@ const Customers = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="flex justify-center items-center h-screen bg-[#0a0e0f]">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-gray-500">Loading customers...</p>
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#00d4aa] mx-auto mb-4"></div>
+                    <p className="text-[#a0b4b8]">Loading customers...</p>
                 </div>
             </div>
         );
@@ -467,90 +461,90 @@ const Customers = () => {
         <>
             <SEO title="Customers - PoolTrader" description="Manage customers and funds" />
             
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="min-h-screen bg-[#0a0e0f]">
                 <div className="container mx-auto px-4 py-8">
                     {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <h1 className="text-4xl font-bold gradient-text">
                             👥 Customer Management
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-2">
+                        <p className="text-[#a0b4b8] mt-2">
                             Manage customer funds, deposits, withdrawals, and profit distributions
                         </p>
                     </div>
 
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+                        <div className="stat-card">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl text-2xl">👥</div>
-                                <span className="text-sm font-semibold text-green-600">Total</span>
+                                <div className="p-3 bg-[#1c2426] rounded-xl text-2xl">👥</div>
+                                <span className="text-sm font-semibold text-[#00d4aa]">Total</span>
                             </div>
-                            <h3 className="text-2xl font-bold">{users.length}</h3>
-                            <p className="text-gray-500 text-sm mt-1">Total Customers</p>
+                            <h3 className="text-2xl font-bold text-[#e8f0f0]">{users.length}</h3>
+                            <p className="text-[#6a7e82] text-sm mt-1">Total Customers</p>
                         </div>
                         
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+                        <div className="stat-card">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl text-2xl">💰</div>
-                                <span className="text-sm font-semibold text-green-600">Deposits</span>
+                                <div className="p-3 bg-[#1c2426] rounded-xl text-2xl">💰</div>
+                                <span className="text-sm font-semibold text-[#00d4aa]">Deposits</span>
                             </div>
-                            <h3 className="text-2xl font-bold">${totalDeposits.toLocaleString()}</h3>
-                            <p className="text-gray-500 text-sm mt-1">Total Deposits</p>
+                            <h3 className="text-2xl font-bold text-[#e8f0f0]">{formatCurrency(totalDeposits)}</h3>
+                            <p className="text-[#6a7e82] text-sm mt-1">Total Deposits</p>
                         </div>
                         
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+                        <div className="stat-card">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl text-2xl">💳</div>
-                                <span className="text-sm font-semibold text-green-600">Balance</span>
+                                <div className="p-3 bg-[#1c2426] rounded-xl text-2xl">💳</div>
+                                <span className="text-sm font-semibold text-[#00d4aa]">Balance</span>
                             </div>
-                            <h3 className="text-2xl font-bold">${totalBalance.toLocaleString()}</h3>
-                            <p className="text-gray-500 text-sm mt-1">Total Customer Balance</p>
+                            <h3 className="text-2xl font-bold text-[#e8f0f0]">{formatCurrency(totalBalance)}</h3>
+                            <p className="text-[#6a7e82] text-sm mt-1">Total Customer Balance</p>
                         </div>
                     </div>
 
                     {/* Action Buttons */}
                     <div className="flex flex-wrap gap-3 mb-8">
-                        <button onClick={() => { setModalType('deposit'); setShowModal(true); }} className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-md">
+                        <button onClick={() => { setModalType('deposit'); setShowModal(true); }} className="btn btn-success">
                             💰 Record Deposit
                         </button>
-                        <button onClick={() => { setModalType('withdrawal'); setShowModal(true); }} className="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition shadow-md">
+                        <button onClick={() => { setModalType('withdrawal'); setShowModal(true); }} className="btn btn-warning">
                             💸 Process Withdrawal
                         </button>
-                        <button onClick={() => { setModalType('profit'); setShowModal(true); }} className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-md">
+                        <button onClick={() => { setModalType('profit'); setShowModal(true); }} className="btn btn-primary">
                             📊 Calculate & Distribute Profits
                         </button>
                     </div>
 
                     {/* Customers Table */}
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                    <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl overflow-hidden card-hover">
                         <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gray-50 dark:bg-gray-700">
+                            <table className="table-dark">
+                                <thead>
                                     <tr>
-                                        <th className="p-4 text-left">ID</th>
-                                        <th className="p-4 text-left">Customer Name</th>
-                                        <th className="p-4 text-left">Email</th>
-                                        <th className="p-4 text-left">Current Balance</th>
-                                        <th className="p-4 text-left">Total Deposited</th>
-                                        <th className="p-4 text-left">Total Withdrawn</th>
-                                        <th className="p-4 text-left">Joined</th>
-                                        <th className="p-4 text-left">Actions</th>
+                                        <th>ID</th>
+                                        <th>Customer Name</th>
+                                        <th>Email</th>
+                                        <th>Current Balance</th>
+                                        <th>Total Deposited</th>
+                                        <th>Total Withdrawn</th>
+                                        <th>Joined</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {users.map(customer => (
-                                        <tr key={customer.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                                            <td className="p-4">{customer.id}</td>
-                                            <td className="p-4 font-medium">{customer.full_name}</td>
-                                            <td className="p-4">{customer.email}</td>
-                                            <td className="p-4 font-bold text-green-600">${parseFloat(customer.current_balance || 0).toLocaleString()}</td>
-                                            <td className="p-4 text-blue-600">${parseFloat(customer.total_deposited || 0).toLocaleString()}</td>
-                                            <td className="p-4 text-red-600">${parseFloat(customer.total_withdrawn || 0).toLocaleString()}</td>
-                                            <td className="p-4">{new Date(customer.joined_date).toLocaleDateString()}</td>
+                                        <tr key={customer.id} className="hover:bg-[#1c2426] transition">
+                                            <td className="p-4 text-[#a0b4b8]">{customer.id}</td>
+                                            <td className="p-4 font-medium text-[#e8f0f0]">{customer.full_name}</td>
+                                            <td className="p-4 text-[#a0b4b8]">{customer.email}</td>
+                                            <td className="p-4 font-bold text-[#00d4aa]">{formatCurrency(customer.current_balance)}</td>
+                                            <td className="p-4 text-[#4aa0ff]">{formatCurrency(customer.total_deposited)}</td>
+                                            <td className="p-4 text-[#ff6b6b]">{formatCurrency(customer.total_withdrawn)}</td>
+                                            <td className="p-4 text-[#a0b4b8]">{new Date(customer.joined_date).toLocaleDateString()}</td>
                                             <td className="p-4">
-                                                <button onClick={() => fetchUserDetails(customer.id)} className="text-blue-600 hover:text-blue-800 mr-3 transition" title="View Details">👁️</button>
-                                                <button onClick={() => handleResetUserPassword(customer.id)} className="text-yellow-600 hover:text-yellow-800 transition" title="Reset Password">🔑</button>
+                                                <button onClick={() => fetchUserDetails(customer.id)} className="text-[#00d4aa] hover:text-[#33ddbb] mr-3 transition" title="View Details">👁️</button>
+                                                <button onClick={() => handleResetUserPassword(customer.id)} className="text-[#ffd93d] hover:text-[#f5a623] transition" title="Reset Password">🔑</button>
                                             </td>
                                         </tr>
                                     ))}

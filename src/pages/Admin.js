@@ -19,6 +19,14 @@ const Admin = () => {
     const [modalType, setModalType] = useState('');
     const [formData, setFormData] = useState({});
 
+    // Helper function to format currency
+    const formatCurrency = (value) => {
+        if (value === null || value === undefined) return '-';
+        const num = parseFloat(value);
+        if (isNaN(num)) return '-';
+        return `$${num.toLocaleString()}`;
+    };
+
     useEffect(() => {
         if (user?.isAdmin) {
             fetchAllData();
@@ -153,76 +161,135 @@ const Admin = () => {
         if (!showModal) return null;
         
         return (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-                    <h2 className="text-2xl font-bold mb-4">
-                        {modalType === 'user' && 'Create New User'}
-                        {modalType === 'pool' && 'Create New Pool'}
-                        {modalType === 'trade' && 'Create New Trade'}
-                    </h2>
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto modal-dark">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-2xl font-bold text-[#e8f0f0]">
+                            {modalType === 'user' && 'Create New User'}
+                            {modalType === 'pool' && 'Create New Pool'}
+                            {modalType === 'trade' && 'Create New Trade'}
+                        </h2>
+                        <button onClick={() => setShowModal(false)} className="text-[#a0b4b8] hover:text-[#e8f0f0] text-2xl transition">✕</button>
+                    </div>
                     
                     <form onSubmit={
                         modalType === 'user' ? handleCreateUser :
                         modalType === 'pool' ? handleCreatePool :
                         handleCreateTrade
-                    }>
+                    } className="space-y-4">
                         {modalType === 'user' && (
                             <>
-                                <input type="email" placeholder="Email" className="w-full p-2 mb-3 border rounded dark:bg-gray-700" 
-                                    onChange={(e) => setFormData({...formData, email: e.target.value})} required />
-                                <input type="text" placeholder="Full Name" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, full_name: e.target.value})} required />
-                                <input type="password" placeholder="Password" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, password: e.target.value})} required />
-                                <label className="flex items-center mb-3">
-                                    <input type="checkbox" className="mr-2" 
-                                        onChange={(e) => setFormData({...formData, is_admin: e.target.checked})} />
-                                    Is Admin
-                                </label>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Email</label>
+                                    <input type="email" placeholder="Email" className="input-dark" 
+                                        onChange={(e) => setFormData({...formData, email: e.target.value})} required />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Full Name</label>
+                                    <input type="text" placeholder="Full Name" className="input-dark"
+                                        onChange={(e) => setFormData({...formData, full_name: e.target.value})} required />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Password</label>
+                                    <input type="password" placeholder="Password" className="input-dark"
+                                        onChange={(e) => setFormData({...formData, password: e.target.value})} required />
+                                </div>
+                                <div className="flex items-center">
+                                    <label className="flex items-center text-[#a0b4b8] cursor-pointer">
+                                        <input type="checkbox" className="mr-2 w-4 h-4 accent-[#00d4aa]" 
+                                            onChange={(e) => setFormData({...formData, is_admin: e.target.checked})} />
+                                        Is Admin
+                                    </label>
+                                </div>
                             </>
                         )}
                         
                         {modalType === 'pool' && (
                             <>
-                                <input type="text" placeholder="Pool Name" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, name: e.target.value})} required />
-                                <textarea placeholder="Description" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, description: e.target.value})} />
-                                <input type="date" placeholder="Start Date" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, start_date: e.target.value})} required />
-                                <input type="date" placeholder="End Date" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, end_date: e.target.value})} required />
-                                <input type="number" placeholder="Target Amount" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, total_target: e.target.value})} required />
-                                <input type="number" placeholder="Min Contribution" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, min_contribution: e.target.value})} />
-                                <input type="number" placeholder="Max Contribution" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, max_contribution: e.target.value})} />
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Pool Name</label>
+                                    <input type="text" placeholder="Pool Name" className="input-dark"
+                                        onChange={(e) => setFormData({...formData, name: e.target.value})} required />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Description</label>
+                                    <textarea placeholder="Description" className="input-dark" rows="2"
+                                        onChange={(e) => setFormData({...formData, description: e.target.value})} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Start Date</label>
+                                        <input type="date" className="input-dark"
+                                            onChange={(e) => setFormData({...formData, start_date: e.target.value})} required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">End Date</label>
+                                        <input type="date" className="input-dark"
+                                            onChange={(e) => setFormData({...formData, end_date: e.target.value})} required />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Target Amount</label>
+                                    <input type="number" placeholder="Target Amount" className="input-dark"
+                                        onChange={(e) => setFormData({...formData, total_target: e.target.value})} required />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Min Contribution</label>
+                                        <input type="number" placeholder="Min" className="input-dark"
+                                            onChange={(e) => setFormData({...formData, min_contribution: e.target.value})} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Max Contribution</label>
+                                        <input type="number" placeholder="Max" className="input-dark"
+                                            onChange={(e) => setFormData({...formData, max_contribution: e.target.value})} />
+                                    </div>
+                                </div>
                             </>
                         )}
                         
                         {modalType === 'trade' && (
                             <>
-                                <input type="number" placeholder="Pool ID" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, pool_id: e.target.value})} required />
-                                <input type="text" placeholder="Symbol (e.g., EUR/USD)" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, symbol: e.target.value})} required />
-                                <select className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, direction: e.target.value})} required>
-                                    <option value="">Select Direction</option>
-                                    <option value="BUY">BUY</option>
-                                    <option value="SELL">SELL</option>
-                                </select>
-                                <input type="number" placeholder="Volume" step="0.01" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, volume: e.target.value})} required />
-                                <input type="number" placeholder="Open Price" step="0.0001" className="w-full p-2 mb-3 border rounded dark:bg-gray-700"
-                                    onChange={(e) => setFormData({...formData, open_price: e.target.value})} required />
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Pool ID</label>
+                                    <input type="number" placeholder="Pool ID" className="input-dark"
+                                        onChange={(e) => setFormData({...formData, pool_id: e.target.value})} required />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Symbol</label>
+                                    <input type="text" placeholder="Symbol (e.g., EUR/USD)" className="input-dark"
+                                        onChange={(e) => setFormData({...formData, symbol: e.target.value})} required />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Direction</label>
+                                    <select className="input-dark"
+                                        onChange={(e) => setFormData({...formData, direction: e.target.value})} required>
+                                        <option value="">Select Direction</option>
+                                        <option value="BUY">📈 BUY</option>
+                                        <option value="SELL">📉 SELL</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Volume</label>
+                                    <input type="number" placeholder="Volume" step="0.01" className="input-dark"
+                                        onChange={(e) => setFormData({...formData, volume: e.target.value})} required />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Open Price</label>
+                                    <input type="number" placeholder="Open Price" step="0.0001" className="input-dark"
+                                        onChange={(e) => setFormData({...formData, open_price: e.target.value})} required />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-[#a0b4b8] mb-1">Entry Amount ($)</label>
+                                    <input type="number" placeholder="Entry Amount" step="0.01" className="input-dark"
+                                        onChange={(e) => setFormData({...formData, entry_amount: e.target.value})} />
+                                </div>
                             </>
                         )}
                         
-                        <div className="flex justify-end space-x-3">
-                            <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded">Cancel</button>
-                            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Create</button>
+                        <div className="flex justify-end space-x-3 pt-4 border-t border-[#2a3538]">
+                            <button type="button" onClick={() => setShowModal(false)} className="btn btn-outline">Cancel</button>
+                            <button type="submit" className="btn btn-primary">Create</button>
                         </div>
                     </form>
                 </div>
@@ -232,8 +299,11 @@ const Admin = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="flex justify-center items-center h-screen bg-[#0a0e0f]">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#00d4aa] mx-auto mb-4"></div>
+                    <p className="text-[#a0b4b8]">Loading admin panel...</p>
+                </div>
             </div>
         );
     }
@@ -242,217 +312,270 @@ const Admin = () => {
         <>
             <SEO title="Admin Panel - PoolTrader" description="Administration panel" />
             
-            <div className="container mx-auto px-4 py-8">
-                <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
-                    <h1 className="text-3xl font-bold">Admin Panel</h1>
-                    <div className="flex space-x-3 flex-wrap gap-2">
-                        <button onClick={() => { setModalType('user'); setShowModal(true); }} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                            + Add User
-                        </button>
-                        <button onClick={() => { setModalType('pool'); setShowModal(true); }} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                            + Create Pool
-                        </button>
-                        <button onClick={() => { setModalType('trade'); setShowModal(true); }} className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
-                            + Add Trade
-                        </button>
-                    </div>
-                </div>
-                
-                {/* Tabs */}
-                <div className="flex flex-wrap border-b dark:border-gray-700 mb-8 gap-2">
-                    {['dashboard', 'users', 'pools', 'trades', 'contributions', 'withdrawals'].map(tab => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`px-4 py-2 font-semibold transition capitalize ${
-                                activeTab === tab 
-                                    ? 'border-b-2 border-blue-600 text-blue-600'
-                                    : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Dashboard Tab */}
-                {activeTab === 'dashboard' && (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                            <p className="text-gray-500 text-sm">Total Users</p>
-                            <p className="text-3xl font-bold text-blue-600">{stats.totalUsers || 0}</p>
+            <div className="min-h-screen bg-[#0a0e0f]">
+                <div className="container mx-auto px-4 py-8">
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold gradient-text">Admin Panel</h1>
+                            <p className="text-[#a0b4b8] mt-1">Manage users, pools, trades, and more</p>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                            <p className="text-gray-500 text-sm">Total Pools</p>
-                            <p className="text-3xl font-bold text-green-600">{stats.totalPools || 0}</p>
-                        </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                            <p className="text-gray-500 text-sm">Total Trades</p>
-                            <p className="text-3xl font-bold text-purple-600">{stats.totalTrades || 0}</p>
-                        </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                            <p className="text-gray-500 text-sm">Total Contributions</p>
-                            <p className="text-3xl font-bold text-orange-600">${(stats.totalContributions || 0).toLocaleString()}</p>
+                        <div className="flex space-x-3 flex-wrap gap-2">
+                            <button onClick={() => { setModalType('user'); setShowModal(true); }} className="btn btn-success">
+                                + Add User
+                            </button>
+                            <button onClick={() => { setModalType('pool'); setShowModal(true); }} className="btn btn-primary">
+                                + Create Pool
+                            </button>
+                            <button onClick={() => { setModalType('trade'); setShowModal(true); }} className="btn btn-secondary">
+                                + Add Trade
+                            </button>
                         </div>
                     </div>
-                )}
-
-                {/* Users Tab */}
-                {activeTab === 'users' && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-x-auto">
-                        <table className="w-full min-w-[800px]">
-                            <thead className="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th className="p-4 text-left">ID</th>
-                                    <th className="p-4 text-left">Name</th>
-                                    <th className="p-4 text-left">Email</th>
-                                    <th className="p-4 text-left">Balance</th>
-                                    <th className="p-4 text-left">Admin</th>
-                                    <th className="p-4 text-left">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map(u => (
-                                    <tr key={u.id} className="border-b dark:border-gray-700">
-                                        <td className="p-4">{u.id}</td>
-                                        <td className="p-4 font-medium">{u.full_name}</td>
-                                        <td className="p-4">{u.email}</td>
-                                        <td className="p-4">${parseFloat(u.current_balance || 0).toLocaleString()}</td>
-                                        <td className="p-4">{u.is_admin ? '✓' : '-'}</td>
-                                        <td className="p-4">
-                                            <button onClick={() => handleResetPassword(u.id)} className="text-blue-600 hover:underline mr-3">
-                                                Reset PW
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-
-                {/* Pools Tab */}
-                {activeTab === 'pools' && (
-                    <div className="space-y-4">
-                        {pools.map(pool => (
-                            <div key={pool.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                                <div className="flex justify-between items-start flex-wrap">
-                                    <div>
-                                        <h3 className="text-xl font-bold">{pool.name}</h3>
-                                        <p className="text-gray-600 text-sm">{new Date(pool.start_date).toLocaleDateString()} - {new Date(pool.end_date).toLocaleDateString()}</p>
-                                        <p className="mt-2">Target: ${parseFloat(pool.total_target).toLocaleString()} | Current: ${parseFloat(pool.current_total || 0).toLocaleString()}</p>
-                                        <p>Members: {pool.member_count || 0} | Trades: {pool.trade_count || 0}</p>
-                                    </div>
-                                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                        pool.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                                    }`}>
-                                        {pool.status.toUpperCase()}
-                                    </span>
-                                </div>
-                            </div>
+                    
+                    {/* Tabs */}
+                    <div className="flex flex-wrap border-b border-[#2a3538] mb-8 gap-1">
+                        {['dashboard', 'users', 'pools', 'trades', 'contributions', 'withdrawals'].map(tab => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`px-5 py-3 font-semibold transition capitalize rounded-t-lg ${
+                                    activeTab === tab 
+                                        ? 'bg-[#161c1e] text-[#00d4aa] border-b-2 border-[#00d4aa]'
+                                        : 'text-[#a0b4b8] hover:text-[#e8f0f0] hover:bg-[#1c2426]'
+                                }`}
+                            >
+                                {tab}
+                            </button>
                         ))}
                     </div>
-                )}
 
-                {/* Trades Tab */}
-                {activeTab === 'trades' && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-x-auto">
-                        <table className="w-full min-w-[800px]">
-                            <thead className="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th className="p-4">Pool</th>
-                                    <th className="p-4">Symbol</th>
-                                    <th className="p-4">Direction</th>
-                                    <th className="p-4">Volume</th>
-                                    <th className="p-4">Entry</th>
-                                    <th className="p-4">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {trades.map(trade => (
-                                    <tr key={trade.id} className="border-b dark:border-gray-700">
-                                        <td className="p-4">{trade.pool_name}</td>
-                                        <td className="p-4">{trade.symbol}</td>
-                                        <td className="p-4">{trade.direction}</td>
-                                        <td className="p-4">{trade.volume}</td>
-                                        <td className="p-4">${parseFloat(trade.open_price).toFixed(4)}</td>
-                                        <td className="p-4">{trade.status}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                    {/* Dashboard Tab */}
+                    {activeTab === 'dashboard' && (
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="stat-card">
+                                <div className="stat-label">Total Users</div>
+                                <div className="stat-value text-[#4aa0ff]">{stats.totalUsers || 0}</div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-label">Total Pools</div>
+                                <div className="stat-value text-[#00d4aa]">{stats.totalPools || 0}</div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-label">Total Trades</div>
+                                <div className="stat-value text-[#a855f7]">{stats.totalTrades || 0}</div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-label">Total Contributions</div>
+                                <div className="stat-value text-[#ffd93d]">{formatCurrency(stats.totalContributions)}</div>
+                            </div>
+                        </div>
+                    )}
 
-                {/* Contributions Tab */}
-                {activeTab === 'contributions' && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-x-auto">
-                        <table className="w-full min-w-[800px]">
-                            <thead className="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th className="p-4">User</th>
-                                    <th className="p-4">Pool</th>
-                                    <th className="p-4">Amount</th>
-                                    <th className="p-4">Share %</th>
-                                    <th className="p-4">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {contributions.map(c => (
-                                    <tr key={c.id} className="border-b dark:border-gray-700">
-                                        <td className="p-4">{c.user_name}</td>
-                                        <td className="p-4">{c.pool_name}</td>
-                                        <td className="p-4">${parseFloat(c.amount).toLocaleString()}</td>
-                                        <td className="p-4">{parseFloat(c.percentage_share || 0).toFixed(2)}%</td>
-                                        <td className="p-4">{new Date(c.created_at).toLocaleDateString()}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                    {/* Users Tab */}
+                    {activeTab === 'users' && (
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl overflow-hidden card-hover">
+                            <div className="overflow-x-auto">
+                                <table className="table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Balance</th>
+                                            <th>Admin</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {users.map(u => (
+                                            <tr key={u.id} className="hover:bg-[#1c2426] transition">
+                                                <td className="p-4 text-[#a0b4b8]">{u.id}</td>
+                                                <td className="p-4 font-medium text-[#e8f0f0]">{u.full_name}</td>
+                                                <td className="p-4 text-[#a0b4b8]">{u.email}</td>
+                                                <td className="p-4 font-semibold text-[#00d4aa]">{formatCurrency(u.current_balance)}</td>
+                                                <td className="p-4 text-[#a0b4b8]">{u.is_admin ? '✅' : '-'}</td>
+                                                <td className="p-4">
+                                                    <button onClick={() => handleResetPassword(u.id)} className="text-[#ffd93d] hover:text-[#f5a623] transition text-sm font-medium">
+                                                        Reset PW
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
 
-                {/* Withdrawals Tab */}
-                {activeTab === 'withdrawals' && (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-x-auto">
-                        <table className="w-full min-w-[800px]">
-                            <thead className="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th className="p-4">User</th>
-                                    <th className="p-4">Amount</th>
-                                    <th className="p-4">Status</th>
-                                    <th className="p-4">Request Date</th>
-                                    <th className="p-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {withdrawals.map(w => (
-                                    <tr key={w.id} className="border-b dark:border-gray-700">
-                                        <td className="p-4">{w.user_name}</td>
-                                        <td className="p-4">${parseFloat(w.amount).toLocaleString()}</td>
-                                        <td className="p-4">
-                                            <span className={`px-2 py-1 rounded text-xs ${
-                                                w.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
-                                            }`}>
-                                                {w.status}
-                                            </span>
-                                        </td>
-                                        <td className="p-4">{new Date(w.request_date).toLocaleDateString()}</td>
-                                        <td className="p-4">
-                                            {w.status === 'pending' && (
-                                                <button onClick={() => handleApproveWithdrawal(w.id)} className="bg-green-600 text-white px-3 py-1 rounded text-sm">
-                                                    Approve
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                    {/* Pools Tab */}
+                    {activeTab === 'pools' && (
+                        <div className="space-y-4">
+                            {pools.map(pool => {
+                                const progress = (parseFloat(pool.current_total || 0) / parseFloat(pool.total_target)) * 100;
+                                return (
+                                    <div key={pool.id} className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 card-hover">
+                                        <div className="flex justify-between items-start flex-wrap gap-4">
+                                            <div>
+                                                <div className="flex items-center gap-3">
+                                                    <h3 className="text-xl font-bold text-[#e8f0f0]">{pool.name}</h3>
+                                                    <span className={`badge ${pool.status === 'open' ? 'badge-success' : 'badge-gray'}`}>
+                                                        {pool.status.toUpperCase()}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[#a0b4b8] text-sm">
+                                                    {new Date(pool.start_date).toLocaleDateString()} - {new Date(pool.end_date).toLocaleDateString()}
+                                                </p>
+                                                <div className="mt-3 flex flex-wrap gap-6">
+                                                    <div>
+                                                        <span className="text-[#6a7e82] text-sm">Target</span>
+                                                        <p className="font-semibold text-[#e8f0f0]">{formatCurrency(pool.total_target)}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[#6a7e82] text-sm">Current</span>
+                                                        <p className="font-semibold text-[#00d4aa]">{formatCurrency(pool.current_total)}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[#6a7e82] text-sm">Members</span>
+                                                        <p className="font-semibold text-[#e8f0f0]">{pool.member_count || 0}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[#6a7e82] text-sm">Trades</span>
+                                                        <p className="font-semibold text-[#e8f0f0]">{pool.trade_count || 0}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-3 w-full max-w-md">
+                                                    <div className="flex justify-between text-sm mb-1">
+                                                        <span className="text-[#a0b4b8]">Progress</span>
+                                                        <span className="text-[#e8f0f0] font-semibold">{progress.toFixed(1)}%</span>
+                                                    </div>
+                                                    <div className="w-full bg-[#1c2426] rounded-full h-2">
+                                                        <div className="bg-gradient-to-r from-[#00d4aa] to-[#00b894] h-2 rounded-full" style={{ width: `${progress}%` }}></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
 
-                {renderModal()}
+                    {/* Trades Tab */}
+                    {activeTab === 'trades' && (
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl overflow-hidden card-hover">
+                            <div className="overflow-x-auto">
+                                <table className="table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th>Pool</th>
+                                            <th>Symbol</th>
+                                            <th>Direction</th>
+                                            <th>Lot Size</th>
+                                            <th>Entry</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {trades.map(trade => (
+                                            <tr key={trade.id} className="hover:bg-[#1c2426] transition">
+                                                <td className="p-4 text-[#e8f0f0]">{trade.pool_name}</td>
+                                                <td className="p-4 font-semibold text-[#e8f0f0]">{trade.symbol}</td>
+                                                <td className="p-4">
+                                                    <span className={`badge ${trade.direction === 'BUY' ? 'badge-success' : 'badge-danger'}`}>
+                                                        {trade.direction}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4 text-[#e8f0f0]">{trade.lot_size || trade.volume || '-'}</td>
+                                                <td className="p-4 text-[#e8f0f0]">${parseFloat(trade.open_price).toFixed(4)}</td>
+                                                <td className="p-4">
+                                                    <span className={`badge ${trade.status === 'open' ? 'badge-warning' : 'badge-gray'}`}>
+                                                        {trade.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Contributions Tab */}
+                    {activeTab === 'contributions' && (
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl overflow-hidden card-hover">
+                            <div className="overflow-x-auto">
+                                <table className="table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Pool</th>
+                                            <th>Amount</th>
+                                            <th>Share %</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {contributions.map(c => (
+                                            <tr key={c.id} className="hover:bg-[#1c2426] transition">
+                                                <td className="p-4 text-[#e8f0f0]">{c.user_name}</td>
+                                                <td className="p-4 text-[#e8f0f0]">{c.pool_name}</td>
+                                                <td className="p-4 font-semibold text-[#00d4aa]">{formatCurrency(c.amount)}</td>
+                                                <td className="p-4 text-[#a0b4b8]">{parseFloat(c.percentage_share || 0).toFixed(2)}%</td>
+                                                <td className="p-4 text-[#a0b4b8]">{new Date(c.created_at).toLocaleDateString()}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Withdrawals Tab */}
+                    {activeTab === 'withdrawals' && (
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl overflow-hidden card-hover">
+                            <div className="overflow-x-auto">
+                                <table className="table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Request Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {withdrawals.map(w => (
+                                            <tr key={w.id} className="hover:bg-[#1c2426] transition">
+                                                <td className="p-4 text-[#e8f0f0]">{w.user_name}</td>
+                                                <td className="p-4 font-semibold text-[#ff6b6b]">{formatCurrency(w.amount)}</td>
+                                                <td className="p-4">
+                                                    <span className={`badge ${w.status === 'pending' ? 'badge-warning' : 'badge-success'}`}>
+                                                        {w.status}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4 text-[#a0b4b8]">{new Date(w.request_date).toLocaleDateString()}</td>
+                                                <td className="p-4">
+                                                    {w.status === 'pending' && (
+                                                        <button onClick={() => handleApproveWithdrawal(w.id)} className="btn btn-success btn-sm">
+                                                            Approve
+                                                        </button>
+                                                    )}
+                                                    {w.status === 'approved' && (
+                                                        <span className="text-[#00d4aa] text-sm font-medium">✓ Approved</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {renderModal()}
+                </div>
             </div>
         </>
     );

@@ -15,6 +15,14 @@ const Contribute = () => {
     const [selectedPayment, setSelectedPayment] = useState('crypto');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
 
+    // Helper function to format currency
+    const formatCurrency = (value) => {
+        if (value === null || value === undefined) return '-';
+        const num = parseFloat(value);
+        if (isNaN(num)) return '-';
+        return `$${num.toLocaleString()}`;
+    };
+
     const fetchActivePool = async () => {
         try {
             const response = await getActivePool();
@@ -38,10 +46,6 @@ const Contribute = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setShowPaymentModal(true);
-    };
-
-    const processPayment = async () => {
         if (!user) {
             toast.error('Please login to contribute');
             navigate('/login');
@@ -58,6 +62,10 @@ const Contribute = () => {
             return;
         }
         
+        setShowPaymentModal(true);
+    };
+
+    const processPayment = async () => {
         setSubmitting(true);
         setShowPaymentModal(false);
         
@@ -73,7 +81,7 @@ const Contribute = () => {
                 //     payment_method: selectedPayment
                 // });
                 
-                toast.success(`Successfully contributed $${amount.toLocaleString()} to ${pool.name}!`);
+                toast.success(`Successfully contributed ${formatCurrency(amount)} to ${pool.name}!`);
                 navigate('/dashboard');
             }, 2000);
             
@@ -86,10 +94,10 @@ const Contribute = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+            <div className="flex justify-center items-center h-screen bg-[#0a0e0f]">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-gray-400">Loading pool information...</p>
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#00d4aa] mx-auto mb-4"></div>
+                    <p className="text-[#a0b4b8]">Loading pool information...</p>
                 </div>
             </div>
         );
@@ -97,12 +105,12 @@ const Contribute = () => {
 
     if (!pool) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+            <div className="min-h-screen bg-[#0a0e0f] flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-6xl mb-4">🏊</div>
-                    <h1 className="text-2xl font-bold text-white mb-4">No Active Pool</h1>
-                    <p className="text-gray-400 mb-6">No pool is currently accepting contributions.</p>
-                    <Link to="/dashboard" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition">
+                    <h1 className="text-2xl font-bold text-[#e8f0f0] mb-4">No Active Pool</h1>
+                    <p className="text-[#a0b4b8] mb-6">No pool is currently accepting contributions.</p>
+                    <Link to="/dashboard" className="btn btn-primary">
                         Back to Dashboard
                     </Link>
                 </div>
@@ -125,37 +133,37 @@ const Contribute = () => {
 
     return (
         <>
-            <SEO title="Contribute - PoolTrade" description="Contribute to trading pool" />
+            <SEO title="Contribute - PoolTrader" description="Contribute to trading pool" />
             
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12">
+            <div className="min-h-screen bg-[#0a0e0f] py-12">
                 <div className="container mx-auto px-4 max-w-5xl">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <h1 className="text-4xl font-bold gradient-text">
                             Invest in {pool.name}
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-2">
+                        <p className="text-[#a0b4b8] mt-2">
                             Join this trading pool and start earning profits
                         </p>
                     </div>
 
                     <div className="grid lg:grid-cols-2 gap-8">
                         {/* Contribution Form */}
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-                            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+                        <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl overflow-hidden card-hover">
+                            <div className="bg-gradient-to-r from-[#00d4aa] to-[#00b894] text-[#0a0e0f] p-6">
                                 <h2 className="text-2xl font-bold">Contribution Amount</h2>
-                                <p className="text-blue-100 mt-1">
+                                <p className="text-[#0a0e0f]/70 mt-1">
                                     Trading period: {new Date(pool.start_date).toLocaleDateString()} - {new Date(pool.end_date).toLocaleDateString()}
                                 </p>
                             </div>
                             
                             <form onSubmit={handleSubmit} className="p-6 space-y-6">
                                 <div>
-                                    <label className="block font-bold mb-3 text-gray-700 dark:text-gray-300">
+                                    <label className="block font-bold mb-3 text-[#e8f0f0]">
                                         How much would you like to invest?
                                     </label>
                                     <div className="relative">
-                                        <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl text-gray-400">$</span>
+                                        <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl text-[#6a7e82]">$</span>
                                         <input
                                             type="number"
                                             value={amount}
@@ -163,7 +171,7 @@ const Contribute = () => {
                                             step="500"
                                             min={parseFloat(pool.min_contribution)}
                                             max={parseFloat(pool.max_contribution)}
-                                            className="w-full pl-10 pr-4 py-4 text-2xl font-bold border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition dark:bg-gray-700 dark:text-white"
+                                            className="w-full pl-10 pr-4 py-4 text-2xl font-bold bg-[#1c2426] border-2 border-[#2a3538] rounded-xl focus:border-[#00d4aa] focus:ring-2 focus:ring-[#00d4aa] focus:ring-opacity-30 transition text-[#e8f0f0]"
                                         />
                                     </div>
                                     
@@ -175,8 +183,8 @@ const Contribute = () => {
                                                 onClick={() => setAmount(val)}
                                                 className={`px-4 py-2 rounded-lg font-semibold transition transform hover:scale-105 ${
                                                     amount === val 
-                                                        ? 'bg-blue-600 text-white shadow-lg'
-                                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                                        ? 'bg-[#00d4aa] text-[#0a0e0f] shadow-[0_4px_15px_rgba(0,212,170,0.25)]'
+                                                        : 'bg-[#1c2426] text-[#a0b4b8] hover:bg-[#2a3538]'
                                                 }`}
                                             >
                                                 ${val.toLocaleString()}
@@ -185,8 +193,8 @@ const Contribute = () => {
                                     </div>
                                 </div>
 
-                                <div className="border-t dark:border-gray-700 pt-4">
-                                    <h3 className="font-bold mb-3 text-gray-700 dark:text-gray-300">Payment Method</h3>
+                                <div className="border-t border-[#2a3538] pt-4">
+                                    <h3 className="font-bold mb-3 text-[#e8f0f0]">Payment Method</h3>
                                     <div className="grid grid-cols-2 gap-3">
                                         {paymentMethods.map(method => (
                                             <button
@@ -195,8 +203,8 @@ const Contribute = () => {
                                                 onClick={() => setSelectedPayment(method.id)}
                                                 className={`p-4 rounded-xl border-2 transition transform hover:scale-105 ${
                                                     selectedPayment === method.id
-                                                        ? `border-blue-500 bg-gradient-to-r ${method.color} text-white`
-                                                        : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                                        ? `border-[#00d4aa] bg-gradient-to-r ${method.color} text-[#0a0e0f]`
+                                                        : 'border-[#2a3538] hover:border-[#00d4aa] bg-[#1c2426] text-[#a0b4b8]'
                                                 }`}
                                             >
                                                 <div className="text-2xl mb-1">{method.icon}</div>
@@ -209,11 +217,11 @@ const Contribute = () => {
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-green-800 transition transform hover:scale-[1.02] shadow-lg disabled:opacity-50"
+                                    className="w-full btn btn-success btn-lg"
                                 >
                                     {submitting ? (
                                         <span className="flex items-center justify-center">
-                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#0a0e0f]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
@@ -226,59 +234,59 @@ const Contribute = () => {
 
                         {/* Summary Card */}
                         <div className="space-y-6">
-                            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl p-6 text-white">
+                            <div className="bg-gradient-to-r from-[#00d4aa] to-[#00b894] rounded-2xl p-6 text-[#0a0e0f]">
                                 <h3 className="text-xl font-bold mb-4">Investment Summary</h3>
                                 <div className="space-y-3">
-                                    <div className="flex justify-between items-center pb-2 border-b border-white/20">
+                                    <div className="flex justify-between items-center pb-2 border-b border-[#0a0e0f]/20">
                                         <span>Your Contribution</span>
-                                        <span className="text-2xl font-bold">${amount.toLocaleString()}</span>
+                                        <span className="text-2xl font-bold">{formatCurrency(amount)}</span>
                                     </div>
-                                    <div className="flex justify-between items-center pb-2 border-b border-white/20">
+                                    <div className="flex justify-between items-center pb-2 border-b border-[#0a0e0f]/20">
                                         <span>Pool Total After</span>
-                                        <span className="font-semibold">${newTotal.toLocaleString()}</span>
+                                        <span className="font-semibold">{formatCurrency(newTotal)}</span>
                                     </div>
-                                    <div className="flex justify-between items-center pb-2 border-b border-white/20">
+                                    <div className="flex justify-between items-center">
                                         <span>Your Share</span>
                                         <span className="text-2xl font-bold">{userShare.toFixed(2)}%</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-                                <h3 className="text-xl font-bold mb-4 flex items-center">
+                            <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 card-hover">
+                                <h3 className="text-xl font-bold text-[#e8f0f0] mb-4 flex items-center">
                                     <span className="mr-2">📈</span> Estimated Returns
                                 </h3>
                                 <div className="space-y-4">
-                                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">Your Estimated Profit (10% pool gain)</p>
-                                        <p className="text-3xl font-bold text-green-600">+${userKeep.toFixed(2)}</p>
-                                        <p className="text-xs text-gray-500 mt-1">After {pool.manager_fee_percent}% manager fee</p>
+                                    <div className="p-4 bg-[#1c2426] rounded-xl border border-[#00d4aa]/20">
+                                        <p className="text-sm text-[#a0b4b8]">Your Estimated Profit (10% pool gain)</p>
+                                        <p className="text-3xl font-bold text-[#00d4aa]">+{formatCurrency(userKeep)}</p>
+                                        <p className="text-xs text-[#6a7e82] mt-1">After {pool.manager_fee_percent}% manager fee</p>
                                     </div>
-                                    <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl">
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">Manager Fee</p>
-                                        <p className="text-2xl font-bold text-yellow-600">${managerFee.toFixed(2)}</p>
-                                        <p className="text-xs text-gray-500 mt-1">({pool.manager_fee_percent}% of profits)</p>
+                                    <div className="p-4 bg-[#1c2426] rounded-xl border border-[#ffd93d]/20">
+                                        <p className="text-sm text-[#a0b4b8]">Manager Fee</p>
+                                        <p className="text-2xl font-bold text-[#ffd93d]">{formatCurrency(managerFee)}</p>
+                                        <p className="text-xs text-[#6a7e82] mt-1">({pool.manager_fee_percent}% of profits)</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-                                <h3 className="font-bold mb-3 flex items-center">
+                            <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl p-6 card-hover">
+                                <h3 className="font-bold text-[#e8f0f0] mb-3 flex items-center">
                                     <span className="mr-2">📊</span> Pool Statistics
                                 </h3>
                                 <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600 dark:text-gray-400">Current Pool Size</span>
-                                        <span className="font-semibold">${parseFloat(pool.current_total).toLocaleString()}</span>
+                                    <div className="flex justify-between py-2 border-b border-[#2a3538]">
+                                        <span className="text-[#a0b4b8]">Current Pool Size</span>
+                                        <span className="font-semibold text-[#e8f0f0]">{formatCurrency(pool.current_total)}</span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600 dark:text-gray-400">Target</span>
-                                        <span className="font-semibold">${parseFloat(pool.total_target).toLocaleString()}</span>
+                                    <div className="flex justify-between py-2 border-b border-[#2a3538]">
+                                        <span className="text-[#a0b4b8]">Target</span>
+                                        <span className="font-semibold text-[#e8f0f0]">{formatCurrency(pool.total_target)}</span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600 dark:text-gray-400">Remaining</span>
-                                        <span className="font-semibold text-blue-600">
-                                            ${(parseFloat(pool.total_target) - parseFloat(pool.current_total)).toLocaleString()}
+                                    <div className="flex justify-between py-2">
+                                        <span className="text-[#a0b4b8]">Remaining</span>
+                                        <span className="font-semibold text-[#00d4aa]">
+                                            {formatCurrency(parseFloat(pool.total_target) - parseFloat(pool.current_total))}
                                         </span>
                                     </div>
                                 </div>
@@ -288,41 +296,41 @@ const Contribute = () => {
 
                     {/* Payment Modal */}
                     {showPaymentModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 transform animate-slide-up">
+                        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                            <div className="bg-[#161c1e] border border-[#2a3538] rounded-2xl max-w-md w-full p-6 transform animate-slide-up modal-dark">
                                 <div className="text-center mb-6">
-                                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <div className="w-16 h-16 bg-gradient-to-r from-[#00d4aa] to-[#00b894] rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_30px_rgba(0,212,170,0.2)]">
                                         <span className="text-3xl">💳</span>
                                     </div>
-                                    <h3 className="text-2xl font-bold">Complete Payment</h3>
-                                    <p className="text-gray-600 dark:text-gray-400 mt-2">
-                                        Amount: <span className="font-bold text-green-600">${amount.toLocaleString()}</span>
+                                    <h3 className="text-2xl font-bold text-[#e8f0f0]">Complete Payment</h3>
+                                    <p className="text-[#a0b4b8] mt-2">
+                                        Amount: <span className="font-bold text-[#00d4aa]">{formatCurrency(amount)}</span>
                                     </p>
                                 </div>
 
                                 <div className="space-y-4 mb-6">
                                     {selectedPayment === 'crypto' && (
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                                            <p className="text-sm font-mono break-all">
+                                        <div className="p-4 bg-[#1c2426] border border-[#2a3538] rounded-xl">
+                                            <p className="text-sm font-mono break-all text-[#e8f0f0]">
                                                 Send USDC to: <br />
-                                                <span className="text-blue-600">0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb5</span>
+                                                <span className="text-[#00d4aa]">0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb5</span>
                                             </p>
-                                            <p className="text-xs text-gray-500 mt-2">Network: ERC-20</p>
+                                            <p className="text-xs text-[#6a7e82] mt-2">Network: ERC-20</p>
                                         </div>
                                     )}
                                     {selectedPayment === 'bank' && (
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                                            <p>Bank: Chase Bank</p>
-                                            <p>Account: 9876543210</p>
-                                            <p>Routing: 123456789</p>
-                                            <p>Reference: POOL-{pool.id}-{user?.id}</p>
+                                        <div className="p-4 bg-[#1c2426] border border-[#2a3538] rounded-xl">
+                                            <p className="text-[#e8f0f0]">Bank: Chase Bank</p>
+                                            <p className="text-[#e8f0f0]">Account: 9876543210</p>
+                                            <p className="text-[#e8f0f0]">Routing: 123456789</p>
+                                            <p className="text-[#6a7e82] text-sm">Reference: POOL-{pool.id}-{user?.id}</p>
                                         </div>
                                     )}
                                     {selectedPayment === 'mpesa' && (
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                                            <p>Paybill Number: 987654</p>
-                                            <p>Account Number: {user?.id || 'POOL'}{pool.id}</p>
-                                            <p>Amount: ${amount.toLocaleString()}</p>
+                                        <div className="p-4 bg-[#1c2426] border border-[#2a3538] rounded-xl">
+                                            <p className="text-[#e8f0f0]">Paybill Number: 987654</p>
+                                            <p className="text-[#e8f0f0]">Account Number: {user?.id || 'POOL'}{pool.id}</p>
+                                            <p className="text-[#6a7e82] text-sm">Amount: {formatCurrency(amount)}</p>
                                         </div>
                                     )}
                                 </div>
@@ -330,15 +338,16 @@ const Contribute = () => {
                                 <div className="flex gap-3">
                                     <button
                                         onClick={() => setShowPaymentModal(false)}
-                                        className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition"
+                                        className="flex-1 btn btn-outline"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         onClick={processPayment}
-                                        className="flex-1 px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-semibold hover:from-green-700 hover:to-green-800 transition"
+                                        disabled={submitting}
+                                        className="flex-1 btn btn-success"
                                     >
-                                        I've Sent Payment
+                                        {submitting ? 'Processing...' : "I've Sent Payment"}
                                     </button>
                                 </div>
                             </div>
