@@ -134,7 +134,7 @@ const Dashboard = () => {
             return;
         }
         setSelectedPool(pool);
-        setContributeAmount(pool.min_contribution || 500);
+        setContributeAmount(pool.min_contribution || 10);
         setShowContributeModal(true);
     };
 
@@ -264,12 +264,17 @@ const Dashboard = () => {
                                         </Link>
                                     ) : (
                                         <div className="flex flex-wrap justify-center gap-3">
-                                            <Link 
-                                                to="/pools/active" 
+                                            <button 
+                                                onClick={() => {
+                                                    const poolsSection = document.getElementById('active-pools-section');
+                                                    if (poolsSection) {
+                                                        poolsSection.scrollIntoView({ behavior: 'smooth' });
+                                                    }
+                                                }}
                                                 className="inline-block bg-gradient-to-r from-[#00d4aa] to-[#00b894] text-[#0a0e0f] px-8 py-3 rounded-xl font-semibold hover:shadow-[0_8px_30px_rgba(0,212,170,0.35)] transition transform hover:scale-105"
                                             >
-                                                View Active Pools →
-                                            </Link>
+                                                View Active Pools ↓
+                                            </button>
                                             <button 
                                                 onClick={() => {
                                                     if (activePools.length > 0) {
@@ -391,7 +396,7 @@ const Dashboard = () => {
                     )}
 
                     {/* Active Pools Section */}
-                    <div className="mb-8">
+                    <div id="active-pools-section" className="mb-8">
                         <h2 className="text-2xl font-bold text-[#e8f0f0] mb-4 flex items-center">
                             <span className="bg-[#00d4aa] w-3 h-3 rounded-full mr-2 animate-pulse"></span>
                             Active Pools ({activePools.length})
@@ -485,9 +490,17 @@ const Dashboard = () => {
                             <div className="text-center text-white p-6">
                                 <h3 className="text-2xl md:text-3xl font-bold mb-2">Professional Trading Setup</h3>
                                 <p className="text-gray-300 mb-4">Multi-monitor trading stations with real-time data</p>
-                                <Link to="/pools/active" className="btn btn-primary">
-                                    View Active Pools →
-                                </Link>
+                                <button 
+                                    onClick={() => {
+                                        const poolsSection = document.getElementById('active-pools-section');
+                                        if (poolsSection) {
+                                            poolsSection.scrollIntoView({ behavior: 'smooth' });
+                                        }
+                                    }}
+                                    className="btn btn-primary"
+                                >
+                                    View Active Pools ↓
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -526,8 +539,6 @@ const Dashboard = () => {
                             </div>
                         </div>
                     )}
-
-
 
                     {/* Hall of Fame - Public Section */}
                     {leaderboard.length > 0 && (

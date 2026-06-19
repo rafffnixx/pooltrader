@@ -15,15 +15,27 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
     
     if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-      api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setToken(storedToken);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+        api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+        console.log('✅ Auth restored from localStorage');
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    } else {
+      console.log('ℹ️ No stored auth found');
     }
     setIsLoading(false);
   }, []);
@@ -40,8 +52,11 @@ export const AuthProvider = ({ children }) => {
       
       setToken(token);
       setUser(user);
+      setIsAuthenticated(true);
+      console.log('✅ Login successful');
       return { success: true };
     } catch (error) {
+      console.error('❌ Login error:', error);
       throw new Error(error.response?.data?.message || 'Login failed');
     }
   };
@@ -58,8 +73,11 @@ export const AuthProvider = ({ children }) => {
       
       setToken(token);
       setUser(user);
+      setIsAuthenticated(true);
+      console.log('✅ Registration successful');
       return { success: true };
     } catch (error) {
+      console.error('❌ Registration error:', error);
       throw new Error(error.response?.data?.message || 'Registration failed');
     }
   };
@@ -70,6 +88,29 @@ export const AuthProvider = ({ children }) => {
     delete api.defaults.headers.common['Authorization'];
     setToken(null);
     setUser(null);
+    setIsAuthenticated(false);
+    console.log('👋 Logged out');
+  };
+
+  // Refresh user data
+  const refreshUser = async () => {
+    try {
+      const response = await api.get('/auth/me');
+      if (response.data.success) {
+        const updatedUser = response.data.user;
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        console.log('🔄 User refreshed');
+        return { success: true };
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing user:', error);
+      // If token is invalid, logout
+      if (error.response?.status === 401) {
+        logout();
+      }
+      return { success: false };
+    }
   };
 
   return (
@@ -78,10 +119,11 @@ export const AuthProvider = ({ children }) => {
         user,
         token,
         isLoading,
+        isAuthenticated,
         login,
         register,
         logout,
-        isAuthenticated: !!user,
+        refreshUser,
       }}
     >
       {children}

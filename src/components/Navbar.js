@@ -18,30 +18,48 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
+  // ============================================
+  // 🔧 LOGO SIZE SETTINGS - Adjust these values
+  // ============================================
+  // Small:   w-10 h-10 (40px)
+  // Medium:  w-12 h-12 (48px) ← DEFAULT
+  // Large:   w-14 h-14 (56px)
+  // XL:      w-16 h-16 (64px)
+  // Custom:  w-20 h-20 (80px)
+  // ============================================
+  const LOGO_SIZE = 'w-14 h-14'; // ← Change this!
+  const LOGO_RADIUS = 'rounded-xl'; // rounded-xl, rounded-2xl, rounded-full
+  const LOGO_SHADOW = 'shadow-[0_0_20px_rgba(0,212,170,0.15)]';
+  const LOGO_SHADOW_HOVER = 'group-hover:shadow-[0_0_40px_rgba(0,212,170,0.3)]';
+
   return (
     <nav className="bg-[#111618] border-b border-[#2a3538] sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16 md:h-20">
-          {/* Logo */}
+          {/* Logo with Custom Image */}
           <Link to="/" className="flex items-center space-x-3 no-underline group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-r from-[#00d4aa] to-[#00b894] flex items-center justify-center shadow-[0_0_20px_rgba(0,212,170,0.15)] group-hover:shadow-[0_0_40px_rgba(0,212,170,0.3)] transition-all duration-500">
-              <svg className="w-5 h-5 text-[#0a0e0f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
+            <div className={`${LOGO_SIZE} ${LOGO_RADIUS} overflow-hidden flex items-center justify-center ${LOGO_SHADOW} ${LOGO_SHADOW_HOVER} transition-all duration-500`}>
+              <img 
+                src="/pooltrader.png" 
+                alt="PoolTrader Logo" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="font-extrabold text-xl md:text-2xl text-[#e8f0f0] tracking-tight">
               Pool<span className="text-[#00d4aa]">Trader</span>
             </span>
           </Link>
 
-          {/* Desktop Menu */}
+          {/* Desktop Menu - Rest of your navbar code */}
           <div className="hidden lg:flex items-center space-x-1">
-            <Link 
-              to="/" 
-              className={`nav-link font-semibold ${isActive('/') ? 'active' : ''}`}
-            >
-              Home
-            </Link>
+            {!isAuthenticated && (
+              <Link 
+                to="/" 
+                className={`nav-link font-semibold ${isActive('/') ? 'active' : ''}`}
+              >
+                Home
+              </Link>
+            )}
             
             {isAuthenticated && (
               <>
@@ -51,7 +69,6 @@ const Navbar = () => {
                 >
                   Dashboard
                 </Link>
-                {/* REMOVED: "Pools" link for customers */}
                 <Link 
                   to="/history" 
                   className={`nav-link font-semibold ${isActive('/history') ? 'active' : ''}`}
@@ -145,7 +162,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu with Animation */}
+        {/* Mobile Menu */}
         <div 
           className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
             isMobileMenuOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
@@ -153,13 +170,15 @@ const Navbar = () => {
         >
           <div className="py-4 border-t border-[#2a3538]">
             <div className="flex flex-col space-y-1">
-              <Link 
-                to="/" 
-                className={`mobile-nav-link font-semibold ${isActive('/') ? 'active' : ''}`} 
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                🏠 Home
-              </Link>
+              {!isAuthenticated && (
+                <Link 
+                  to="/" 
+                  className={`mobile-nav-link font-semibold ${isActive('/') ? 'active' : ''}`} 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  🏠 Home
+                </Link>
+              )}
               
               {isAuthenticated && (
                 <>
@@ -170,7 +189,6 @@ const Navbar = () => {
                   >
                     📊 Dashboard
                   </Link>
-                  {/* REMOVED: "Pools" from mobile menu */}
                   <Link 
                     to="/history" 
                     className={`mobile-nav-link font-semibold ${isActive('/history') ? 'active' : ''}`} 
